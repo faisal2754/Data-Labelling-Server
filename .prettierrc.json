@@ -1,0 +1,15 @@
+{
+  "trailingComma": "none",
+  "tabWidth": 3,
+  "semi": false,
+  "singleQuote": true,
+  "prettier.endOfLine": "auto",
+  "overrides": [
+    {
+      "files": ["*.json"],
+      "options": {
+        "tabWidth": 2
+      }
+    }
+  ]
+}
