@@ -1,6 +1,10 @@
 import { gql } from 'apollo-server-express'
 import { GraphQLUpload } from 'graphql-upload'
+import { google } from 'googleapis'
 import fs from 'fs'
+import { GoogleService } from '../utils/GoogleServices.js'
+
+const googleService = new GoogleService()
 
 const books = [
    {
@@ -32,7 +36,8 @@ const typeDefs = gql`
    }
 
    type Mutation {
-      singleUpload(file: Upload!): File!
+      storageUpload(file: Upload!): File!
+      streamUpload(file: Upload!): File!
    }
 `
 const resolvers = {
@@ -43,18 +48,26 @@ const resolvers = {
    },
 
    Mutation: {
-      singleUpload: (_, args) => {
-         return args.file.then((file) => {
-            const { createReadStream, filename, mimetype } = file
+      storageUpload: async (_, args) => {
+         const file = await args.file
+         const { createReadStream, filename, mimetype } = file
 
-            const fileStream = createReadStream()
+         const fileStream = createReadStream()
+         fileStream.pipe(fs.createWriteStream(`./uploadedFiles/${filename}`))
 
-            console.log(fileStream)
+         return file
+      },
 
-            fileStream.pipe(fs.createWriteStream(`./uploadedFiles/${filename}`))
+      streamUpload: async (_, args) => {
+         const file = await args.file
+         const { createReadStream, filename, mimetype } = file
+         const fileStream = createReadStream()
 
-            return file
-         })
+         const result = await googleService.uploadStream(filename, fileStream)
+
+         //https://drive.google.com/uc?id
+
+         return file
       }
    }
 }
