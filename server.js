@@ -3,7 +3,7 @@ import { graphqlUploadExpress } from 'graphql-upload'
 import express from 'express'
 import { typeDefs, resolvers } from './schema/schema.js'
 
-const port = 4000 || process.env.PORT
+const port = process.env.PORT || 4000
 
 const startApolloServer = async () => {
    const server = new ApolloServer({ typeDefs, resolvers })
