@@ -2,8 +2,11 @@ import { gql } from 'apollo-server-express'
 import { GraphQLUpload } from 'graphql-upload'
 import { google } from 'googleapis'
 import fs from 'fs'
-import { GoogleService } from '../utils/GoogleServices.js'
+import { GoogleService } from '../google/GoogleServices.js'
+import client from '@prisma/client'
+const { PrismaClient } = client
 
+const prisma = new PrismaClient()
 const googleService = new GoogleService()
 
 const books = [
@@ -31,8 +34,19 @@ const typeDefs = gql`
       encoding: String!
    }
 
+   type User {
+      user_id: ID!
+      username: String!
+      email: String!
+      password: String!
+      avatar: String
+      balance: Int
+   }
+
    type Query {
       books: [Book]
+      users: [User]
+      user(email: String!): User
    }
 
    type Mutation {
@@ -44,7 +58,27 @@ const resolvers = {
    Upload: GraphQLUpload,
 
    Query: {
-      books: () => books
+      books: () => books,
+      users: async () => {
+         try {
+            const users = await prisma.users.findMany()
+            return users
+         } catch (e) {
+            throw new Error(e)
+         }
+      },
+      user: async (_, { email }) => {
+         try {
+            const user = await prisma.users.findFirst({
+               where: {
+                  email: email
+               }
+            })
+            return user
+         } catch (e) {
+            throw new Error(e)
+         }
+      }
    },
 
    Mutation: {
