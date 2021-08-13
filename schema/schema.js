@@ -30,15 +30,15 @@ const typeDefs = gql`
    }
 
    type Query {
-      users: [User]!
-      user(email: String!): User!
+      users: [User]
+      user(email: String!): User
    }
 
    type Mutation {
-      register(username: String!, email: String!, password: String!): User!
+      register(username: String!, email: String!, password: String!): User
       login(email: String!, password: String!): User
-      storageUpload(file: Upload!): File!
-      streamUpload(file: Upload!): File!
+      storageUpload(file: Upload!): File
+      streamUpload(file: Upload!): File
    }
 `
 const resolvers = {
