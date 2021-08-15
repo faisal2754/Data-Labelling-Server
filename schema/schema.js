@@ -1,13 +1,14 @@
-import { gql } from 'apollo-server-express'
-import { GraphQLUpload } from 'graphql-upload'
-import argon2 from 'argon2'
-import fs from 'fs'
-import jwt from 'jsonwebtoken'
-import { GoogleService } from '../google/GoogleServices.js'
-import client from '@prisma/client'
-const { PrismaClient } = client
+const { gql } = require('apollo-server-express')
+const { GraphQLUpload } = require('graphql-upload')
+const argon2 = require('argon2')
+const fs = require('fs')
+const jwt = require('jsonwebtoken')
+const { GoogleService } = require('../google/GoogleServices')
+const prisma = require('../prisma/client')
+// const client = require( '@prisma/client')
+// const { PrismaClient } = client
 
-const prisma = new PrismaClient()
+// const prisma = new PrismaClient()
 const googleService = new GoogleService()
 
 const typeDefs = gql`
@@ -116,4 +117,4 @@ const resolvers = {
    }
 }
 
-export { typeDefs, resolvers }
+module.exports = { typeDefs, resolvers }

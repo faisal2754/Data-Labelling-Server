@@ -1,13 +1,14 @@
-import fs from 'fs'
-import { google } from 'googleapis'
-import dotenv from 'dotenv'
+const fs = require('fs')
+const { google } = require('googleapis')
+
 if (process.env.NODE_ENV !== 'production') {
+   const dotenv = require('dotenv')
    dotenv.config()
 }
 
 class GoogleService {
    constructor() {
-      //getting credentials from credentials.json
+      //getting credentials = require( credentials.json)
       const bufferCreds = process.env.GOOGLE_CREDS
       if (!bufferCreds) return console.log('Error loading client secret file.')
       const credentials = JSON.parse(bufferCreds)
@@ -18,7 +19,7 @@ class GoogleService {
          redirect_uris[0]
       )
 
-      //getting token from token.json (if it exists)
+      //getting token = require( token.json (if it exists))
       const token = process.env.GOOGLE_TOKEN
       if (!token) return console.log('No token bruh')
       oAuth2Client.setCredentials(JSON.parse(token))
@@ -129,4 +130,4 @@ class GoogleService {
    }
 }
 
-export { GoogleService }
+module.exports = { GoogleService }

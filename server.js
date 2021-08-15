@@ -1,21 +1,12 @@
-import { ApolloServer } from 'apollo-server-express'
-import { graphqlUploadExpress } from 'graphql-upload'
-import express from 'express'
-import { typeDefs, resolvers } from './schema/schema.js'
-import { getUser } from './utils/getUser.js'
+const { ApolloServer } = require('apollo-server-express')
+const { graphqlUploadExpress } = require('graphql-upload')
+const express = require('express')
+const config = require('./apollo/config')
 
 const port = process.env.PORT || 4000
 
 const startApolloServer = async () => {
-   const server = new ApolloServer({
-      typeDefs,
-      resolvers,
-      context: async ({ req }) => {
-         const authHeader = req.headers.authorization
-         const user = await getUser(authHeader)
-         return { user }
-      }
-   })
+   const server = new ApolloServer(config)
    await server.start()
 
    const app = express()

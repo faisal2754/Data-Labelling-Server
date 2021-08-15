@@ -1,8 +1,5 @@
-import jwt from 'jsonwebtoken'
-import client from '@prisma/client'
-const { PrismaClient } = client
-
-const prisma = new PrismaClient()
+const jwt = require('jsonwebtoken')
+const prisma = require('../prisma/client')
 
 const getUser = async (authHeader) => {
    const bearerLength = 'Bearer '.length
@@ -39,4 +36,4 @@ const getUser = async (authHeader) => {
    return null
 }
 
-export { getUser }
+module.exports = { getUser }
