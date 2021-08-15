@@ -4,10 +4,7 @@ const argon2 = require('argon2')
 const fs = require('fs')
 const jwt = require('jsonwebtoken')
 const { GoogleService } = require('../google/GoogleServices')
-// const prisma = require('../prisma/client')
-const { PrismaClient } = require('@prisma/client')
-
-const prisma = new PrismaClient()
+const prisma = require('../prisma/client')
 
 const googleService = new GoogleService()
 
@@ -47,25 +44,23 @@ const resolvers = {
 
    Query: {
       users: async () => {
-         const users = await prisma.users.findMany()
+         const users = await prisma.user.findMany()
          return users
       },
-      user: async (_, { email }, { user }) => {
-         if (!user) throw new Error('Please login.')
-
-         const otherUser = await prisma.users.findFirst({
+      user: async (_, { email }) => {
+         const user = await prisma.user.findFirst({
             where: {
                email: email
             }
          })
-         return otherUser
+         return user
       }
    },
 
    Mutation: {
       register: async (_, { username, email, password }) => {
          const hashedPass = await argon2.hash(password)
-         const user = await prisma.users.create({
+         const user = await prisma.user.create({
             data: {
                username: username,
                email: email,
@@ -80,7 +75,7 @@ const resolvers = {
          return user
       },
       login: async (_, { email, password }) => {
-         const user = await prisma.users.findUnique({
+         const user = await prisma.user.findUnique({
             where: {
                email: email
             }

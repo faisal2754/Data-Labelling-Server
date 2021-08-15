@@ -12,9 +12,6 @@ it('adds 1 + 2 to equal 3', async () => {
    })
 
    const result = await query(GET_USERS)
-   // const result = await server.executeOperation({
-   //    query: GET_USERS
-   // })
 
    console.log(result)
 
