@@ -4,11 +4,11 @@ const argon2 = require('argon2')
 const fs = require('fs')
 const jwt = require('jsonwebtoken')
 const { GoogleService } = require('../google/GoogleServices')
-const prisma = require('../prisma/client')
-// const client = require( '@prisma/client')
-// const { PrismaClient } = client
+// const prisma = require('../prisma/client')
+const { PrismaClient } = require('@prisma/client')
 
-// const prisma = new PrismaClient()
+const prisma = new PrismaClient()
+
 const googleService = new GoogleService()
 
 const typeDefs = gql`

@@ -1,18 +1,20 @@
 const { ApolloServer } = require('apollo-server-express')
+const { createTestClient } = require('apollo-server-integration-testing')
 const config = require('../apollo/config.js')
-const express = require('express')
 const { GET_USERS } = require('../graphql/queries')
 
 it('adds 1 + 2 to equal 3', async () => {
-   const server = new ApolloServer(config)
-   await server.start()
+   const apolloServer = new ApolloServer(config)
+   await apolloServer.start()
 
-   const app = express()
-   server.applyMiddleware({ app })
-
-   const result = await server.executeOperation({
-      query: GET_USERS
+   const { query, mutate } = createTestClient({
+      apolloServer
    })
+
+   const result = await query(GET_USERS)
+   // const result = await server.executeOperation({
+   //    query: GET_USERS
+   // })
 
    console.log(result)
 
