@@ -17,6 +17,7 @@ jobs:
         node-version: [14.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     env:
+        GOOGLE_CREDS: ${{ secrets.GOOGLE_CREDS }}
         DB_URI: postgres://postgres:password@localhost:5432/data_labelling 
     
     steps:
