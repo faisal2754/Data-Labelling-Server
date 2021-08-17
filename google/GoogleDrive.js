@@ -1,12 +1,7 @@
 const fs = require('fs')
 const { google } = require('googleapis')
 
-if (process.env.NODE_ENV !== 'production') {
-   const dotenv = require('dotenv')
-   dotenv.config()
-}
-
-class GoogleService {
+class GoogleDrive {
    constructor() {
       // getting credentials.json
       const bufferCreds = process.env.GOOGLE_CREDS
@@ -132,4 +127,4 @@ class GoogleService {
    }
 }
 
-module.exports = GoogleService
+module.exports = GoogleDrive

@@ -2,6 +2,10 @@ const { ApolloServer } = require('apollo-server-express')
 const { graphqlUploadExpress } = require('graphql-upload')
 const express = require('express')
 const config = require('./apollo/config')
+if (process.env.NODE_ENV !== 'production') {
+   const dotenv = require('dotenv')
+   dotenv.config()
+}
 
 const port = process.env.PORT || 4000
 

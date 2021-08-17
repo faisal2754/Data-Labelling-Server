@@ -3,10 +3,10 @@ const { GraphQLUpload } = require('graphql-upload')
 const argon2 = require('argon2')
 const fs = require('fs')
 const jwt = require('jsonwebtoken')
-const GoogleService = require('../google/GoogleService')
+const GoogleDrive = require('../google/GoogleDrive')
 const prisma = require('../prisma/client')
 
-const googleService = new GoogleService()
+const gDrive = new GoogleDrive()
 
 const typeDefs = gql`
    scalar Upload
@@ -103,7 +103,7 @@ const resolvers = {
          const { createReadStream, filename, mimetype } = await file
          const fileStream = createReadStream()
 
-         const result = await googleService.uploadStream(filename, fileStream)
+         const result = await gDrive.uploadStream(filename, fileStream)
 
          //https://drive.google.com/uc?id
 
