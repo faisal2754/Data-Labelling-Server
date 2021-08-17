@@ -8,18 +8,20 @@ if (process.env.NODE_ENV !== 'production') {
 
 class GoogleService {
    constructor() {
-      //getting credentials = require( credentials.json)
+      // getting credentials.json
       const bufferCreds = process.env.GOOGLE_CREDS
       if (!bufferCreds) return console.log('Error loading client secret file.')
+
       const credentials = JSON.parse(bufferCreds)
       const { client_secret, client_id, redirect_uris } = credentials.installed
+
       const oAuth2Client = new google.auth.OAuth2(
          client_id,
          client_secret,
          redirect_uris[0]
       )
 
-      //getting token = require( token.json (if it exists))
+      // getting token
       const token = process.env.GOOGLE_TOKEN
       if (!token) return console.log('No token bruh')
       oAuth2Client.setCredentials(JSON.parse(token))
@@ -130,4 +132,4 @@ class GoogleService {
    }
 }
 
-module.exports = { GoogleService }
+module.exports = GoogleService

@@ -3,7 +3,7 @@ const { GraphQLUpload } = require('graphql-upload')
 const argon2 = require('argon2')
 const fs = require('fs')
 const jwt = require('jsonwebtoken')
-const { GoogleService } = require('../google/GoogleServices')
+const GoogleService = require('../google/GoogleService')
 const prisma = require('../prisma/client')
 
 const googleService = new GoogleService()

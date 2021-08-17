@@ -1,6 +1,6 @@
 const { ApolloServer } = require('apollo-server-express')
 const { createTestClient } = require('apollo-server-integration-testing')
-const config = require('../apollo/config.js')
+const config = require('../apollo/config')
 const { GET_USERS } = require('../graphql/queries')
 
 it('adds 1 + 2 to equal 3', async () => {
