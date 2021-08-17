@@ -8,59 +8,59 @@ datasource db {
 }
 
 model user {
-  user_id  Int     @id @default(autoincrement())
-  username String
-  email    String  @unique
-  password String  
-  avatar   String? 
-  balance  Int     @default(0)
-  job   job[]
-  job_labeller  job_labeller[]
-  image_label   image_label[]
+  user_id      Int            @id @default(autoincrement())
+  username     String
+  email        String         @unique
+  password     String
+  avatar       String?
+  balance      Int            @default(0)
+  job          job[]
+  job_labeller job_labeller[]
+  image_label  image_label[]
 }
 
 model job {
-  job_id        Int   @id @default(autoincrement())
-  title         String
-  created_at    DateTime @default(now())
-  job_owner_id  Int
-  job_owner     user    @relation(fields: [job_owner_id], references: [user_id])
-  job_labeller  job_labeller[]
-  job_label     job_label[]
-  job_image     job_image[]
+  job_id       Int            @id @default(autoincrement())
+  title        String
+  created_at   DateTime       @default(now())
+  job_owner_id Int
+  job_owner    user           @relation(fields: [job_owner_id], references: [user_id])
+  job_labeller job_labeller[]
+  job_label    job_label[]
+  job_image    job_image[]
 }
 
 model job_labeller {
-  job_id    Int
-  job       job   @relation(fields: [job_id], references: [job_id])
-  user_id   Int
-  user      user   @relation(fields: [user_id], references: [user_id])
+  job_id  Int
+  job     job  @relation(fields: [job_id], references: [job_id])
+  user_id Int
+  user    user @relation(fields: [user_id], references: [user_id])
 
   @@id([job_id, user_id])
 }
 
 model job_label {
-  label_id  Int   @id @default(autoincrement())
-  job_id    Int
-  job       job   @relation(fields: [job_id], references: [job_id])
-  label     String
+  label_id Int    @id @default(autoincrement())
+  job_id   Int
+  job      job    @relation(fields: [job_id], references: [job_id])
+  label    String
 }
 
 model job_image {
-  image_id      Int   @id @default(autoincrement())
-  job_id        Int
-  job           job   @relation(fields: [job_id], references: [job_id])
-  image_uri     String
-  ground_truth  String?
-  image_label   image_label[]
+  image_id     Int           @id @default(autoincrement())
+  job_id       Int
+  job          job           @relation(fields: [job_id], references: [job_id])
+  image_uri    String
+  ground_truth String?
+  image_label  image_label[]
 }
 
 model image_label {
-  user_id    Int
-  user       user   @relation(fields: [user_id], references: [user_id])
-  image_id   Int
-  job_image  job_image   @relation(fields: [image_id], references: [image_id])
-  label      String
+  user_id   Int
+  user      user      @relation(fields: [user_id], references: [user_id])
+  image_id  Int
+  job_image job_image @relation(fields: [image_id], references: [image_id])
+  label     String
 
   @@id([user_id, image_id])
 }
