@@ -17,10 +17,6 @@ const typeDefs = gql`
       encoding: String!
    }
 
-   type Job{
-      images: [File]!
-   }
-
    type User {
       user_id: ID!
       username: String!
@@ -41,7 +37,6 @@ const typeDefs = gql`
       login(email: String!, password: String!): User
       storageUpload(file: Upload!): File
       streamUpload(file: Upload!): File
-      createJob(file: Upload!)
    }
 `
 const resolvers = {
