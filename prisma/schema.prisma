@@ -20,47 +20,60 @@ model user {
 }
 
 model job {
-  job_id       Int            @id @default(autoincrement())
-  title        String
-  created_at   DateTime       @default(now())
-  job_owner_id Int
-  job_owner    user           @relation(fields: [job_owner_id], references: [user_id])
-  job_labeller job_labeller[]
-  job_label    job_label[]
-  job_image    job_image[]
+  job_id        Int             @id @default(autoincrement())
+  title         String
+  created_at    DateTime        @default(now())
+  description   String
+  credits       Int
+  job_owner_id  Int
+  job_owner     user            @relation(fields: [job_owner_id], references: [user_id])
+  job_labeller  job_labeller[]
+  job_label     job_label[]
+  job_partition job_partition[]
 }
 
 model job_labeller {
-  job_id  Int
-  job     job  @relation(fields: [job_id], references: [job_id])
-  user_id Int
-  user    user @relation(fields: [user_id], references: [user_id])
+  job_id        Int
+  job           job           @relation(fields: [job_id], references: [job_id])
+  user_id       Int
+  user          user          @relation(fields: [user_id], references: [user_id])
+  partition_id  Int
+  job_partition job_partition @relation(fields: [partition_id], references: [partition_id])
 
-  @@id([job_id, user_id])
+  @@id([job_id, user_id, partition_id])
 }
 
 model job_label {
   label_id Int    @id @default(autoincrement())
+  label    String
   job_id   Int
   job      job    @relation(fields: [job_id], references: [job_id])
-  label    String
 }
 
 model job_image {
-  image_id     Int           @id @default(autoincrement())
-  job_id       Int
-  job          job           @relation(fields: [job_id], references: [job_id])
-  image_uri    String
-  ground_truth String?
-  image_label  image_label[]
+  image_id      Int           @id @default(autoincrement())
+  image_uri     String
+  partition_id  Int
+  job_partition job_partition @relation(fields: [partition_id], references: [partition_id])
+  image_label   image_label[]
 }
 
 model image_label {
+  label     String
   user_id   Int
   user      user      @relation(fields: [user_id], references: [user_id])
   image_id  Int
   job_image job_image @relation(fields: [image_id], references: [image_id])
-  label     String
 
   @@id([user_id, image_id])
+}
+
+model job_partition {
+  partition_id     Int            @id @default(autoincrement())
+  partition_number Int
+  is_full          Boolean        @default(false)
+  job_id           Int
+  job              job            @relation(fields: [job_id], references: [job_id])
+  job_labeller     job_labeller[]
+  job_image        job_image[]
 }
