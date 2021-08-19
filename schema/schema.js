@@ -1,5 +1,6 @@
 const { gql } = require('apollo-server-express')
 const { GraphQLUpload } = require('graphql-upload')
+const GraphQLDate = require('graphql-date')
 const argon2 = require('argon2')
 const fs = require('fs')
 const jwt = require('jsonwebtoken')
@@ -10,6 +11,7 @@ const gDrive = new GoogleDrive()
 
 const typeDefs = gql`
    scalar Upload
+   scalar Date
 
    type File {
       filename: String!
@@ -27,6 +29,15 @@ const typeDefs = gql`
       jwt: String
    }
 
+   type Job {
+      job_id: ID!
+      job_owner_id: Int!
+      title: String!
+      description: String!
+      credits: Int!
+      created_at: Date!
+   }
+
    type Query {
       users: [User]
       user(email: String!): User
@@ -35,8 +46,14 @@ const typeDefs = gql`
    type Mutation {
       register(username: String!, email: String!, password: String!): User
       login(email: String!, password: String!): User
-      storageUpload(file: Upload!): File
+      storageUpload(file: [Upload], temp: String): [File]
       streamUpload(file: Upload!): File
+      createJob(
+         title: String!
+         description: String!
+         credits: Int!
+         files: [Upload]
+      ): Job
    }
 `
 const resolvers = {
@@ -91,13 +108,43 @@ const resolvers = {
 
          return user
       },
-      storageUpload: async (_, { file }) => {
-         const { createReadStream, filename, mimetype } = await file
 
-         const fileStream = createReadStream()
-         fileStream.pipe(fs.createWriteStream(`./uploadedFiles/${filename}`))
+      createJob: async (_, { title, description, credits, files }) => {
+         const job_owner_id = 3
+         const job = prisma.job.create({
+            data: { title, description, credits, job_owner_id }
+         })
 
-         return file
+         if (!job) throw new Error('Error creating job.')
+
+         return job
+      },
+
+      storageUpload: async (_, args) => {
+         let files = (await Promise.all(args.file)).map(async (file) => {
+            const { createReadStream, filename, mimetype, encoding } =
+               await file
+
+            console.log(filename)
+            const stream = createReadStream()
+            const out = fs.createWriteStream(
+               path.join(__dirname, `/FileUpload/${filename}`)
+            )
+            await stream.pipe(out)
+            return {
+               url: `http://localhost:4000/FileUpload/${filename}`
+            }
+         })
+         return files
+         // const vars = await args.file[0]
+         // console.log(vars)
+
+         // const { createReadStream, filename, mimetype } = await file
+
+         // const fileStream = createReadStream()
+         // fileStream.pipe(fs.createWriteStream(`./uploadedFiles/${filename}`))
+
+         // return file
       },
       streamUpload: async (_, { file }) => {
          const { createReadStream, filename, mimetype } = await file

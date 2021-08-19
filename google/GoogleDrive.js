@@ -69,9 +69,9 @@ class GoogleDrive {
       return promise
    }
 
-   uploadStream(file, stream) {
+   uploadStream(name, stream) {
       const fileMetadata = {
-         name: file,
+         name: name,
          parents: ['165e-zApP58GI_zJHr2wDzSbxIFet29kk']
       }
       const media = {
@@ -85,6 +85,28 @@ class GoogleDrive {
       })
 
       return promise
+   }
+
+   uploadStreams(names, streams) {
+      const promises = []
+      for (let i = 0; i < files.length; i++) {
+         const fileMetadata = {
+            name: names[i],
+            parents: ['165e-zApP58GI_zJHr2wDzSbxIFet29kk']
+         }
+         const media = {
+            mimeType: 'image/jpeg',
+            body: streams[i]
+         }
+         promises.push(
+            this.drive.files.create({
+               resource: fileMetadata,
+               media: media,
+               fields: 'id, name'
+            })
+         )
+      }
+      return Promise.all(promises)
    }
 
    uploadFiles(files, path) {
