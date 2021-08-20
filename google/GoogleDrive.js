@@ -87,9 +87,9 @@ class GoogleDrive {
       return promise
    }
 
-   uploadStreams(names, streams) {
+   async uploadStreams(names, streams) {
       const promises = []
-      for (let i = 0; i < files.length; i++) {
+      for (let i = 0; i < names.length; i++) {
          const fileMetadata = {
             name: names[i],
             parents: ['165e-zApP58GI_zJHr2wDzSbxIFet29kk']
@@ -106,7 +106,9 @@ class GoogleDrive {
             })
          )
       }
-      return Promise.all(promises)
+      const response = await Promise.all(promises)
+
+      return response.map((res) => res.data.id)
    }
 
    uploadFiles(files, path) {

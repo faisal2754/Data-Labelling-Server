@@ -6,6 +6,7 @@ const fs = require('fs')
 const jwt = require('jsonwebtoken')
 const GoogleDrive = require('../google/GoogleDrive')
 const prisma = require('../prisma/client')
+const { $connect } = require('../prisma/client')
 
 const gDrive = new GoogleDrive()
 
@@ -52,12 +53,14 @@ const typeDefs = gql`
          title: String!
          description: String!
          credits: Int!
+         num_partitions: Int!
          files: [Upload]
       ): Job
    }
 `
 const resolvers = {
    Upload: GraphQLUpload,
+   Date: GraphQLDate,
 
    Query: {
       users: async () => {
@@ -109,42 +112,111 @@ const resolvers = {
          return user
       },
 
-      createJob: async (_, { title, description, credits, files }) => {
+      createJob: async (
+         _,
+         { title, description, credits, num_partitions, files }
+      ) => {
+         // Job metadata
          const job_owner_id = 3
-         const job = prisma.job.create({
+         const job = await prisma.job.create({
             data: { title, description, credits, job_owner_id }
          })
 
          if (!job) throw new Error('Error creating job.')
 
+         // Partition creation
+         const encodedFiles = await Promise.all(files)
+         const numImages = encodedFiles.length
+
+         let partitionInfo = {
+            splitArr: [],
+            ids: []
+         }
+
+         const partitionSize = Math.floor(numImages / num_partitions)
+
+         for (let i = 0; i < num_partitions - 1; i++) {
+            partitionInfo.splitArr.push(
+               encodedFiles.slice(i * partitionSize, (i + 1) * partitionSize)
+                  .length
+            )
+
+            partitionInfo.ids.push(
+               await prisma.job_partition.create({
+                  data: {
+                     job_id: job.job_id,
+                     partition_number: i
+                  }
+               })
+            )
+         }
+
+         partitionInfo.splitArr.push(
+            encodedFiles.slice((num_partitions - 1) * partitionSize).length
+         )
+
+         partitionInfo.ids.push(
+            await prisma.job_partition.create({
+               data: {
+                  job_id: job.job_id,
+                  partition_number: num_partitions - 1
+               }
+            })
+         )
+
+         // Job images
+         let filenames = []
+         let streams = []
+
+         for (let i = 0; i < numImages; i++) {
+            const { createReadStream, filename } = await encodedFiles[i]
+
+            filenames.push(filename)
+            var stream = createReadStream()
+            streams.push(stream)
+         }
+
+         const imgIds = await gDrive.uploadStreams(filenames, streams)
+
+         const urls = imgIds.map(
+            (imgId) => `https://drive.google.com/uc?id=${imgId}`
+         )
+
+         // Image table population
+         let startIdx = 0
+         for (let i = 0; i < partitionInfo.splitArr.length; i++) {
+            for (let j = 0; j < partitionInfo.splitArr[i]; j++) {
+               await prisma.job_image.create({
+                  data: {
+                     image_uri: urls[j + startIdx],
+                     partition_id: partitionInfo.ids[i].partition_id
+                  }
+               })
+            }
+
+            startIdx = partitionInfo.splitArr[i]
+         }
+
          return job
       },
 
       storageUpload: async (_, args) => {
-         let files = (await Promise.all(args.file)).map(async (file) => {
-            const { createReadStream, filename, mimetype, encoding } =
-               await file
+         let filenames = []
+         let streams = []
 
-            console.log(filename)
-            const stream = createReadStream()
-            const out = fs.createWriteStream(
-               path.join(__dirname, `/FileUpload/${filename}`)
-            )
-            await stream.pipe(out)
-            return {
-               url: `http://localhost:4000/FileUpload/${filename}`
-            }
-         })
-         return files
-         // const vars = await args.file[0]
-         // console.log(vars)
+         const encodedFiles = await Promise.all(args.file)
 
-         // const { createReadStream, filename, mimetype } = await file
+         for (let i = 0; i < encodedFiles.length; i++) {
+            const { createReadStream, filename } = await encodedFiles[i]
 
-         // const fileStream = createReadStream()
-         // fileStream.pipe(fs.createWriteStream(`./uploadedFiles/${filename}`))
+            filenames.push(filename)
+            var stream = createReadStream()
+            streams.push(stream)
+         }
 
-         // return file
+         const imgIds = await gDrive.uploadStreams(filenames, streams)
+
+         return encodedFiles
       },
       streamUpload: async (_, { file }) => {
          const { createReadStream, filename, mimetype } = await file
