@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "npx prisma generate && node server.js",
     "dev": "nodemon server.js",
     "migrate:test": "npx prisma migrate dev --name test",
     "docker:up": "docker-compose -f tests/docker-compose.yml up -d",
