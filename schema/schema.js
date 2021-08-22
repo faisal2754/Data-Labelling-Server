@@ -6,7 +6,7 @@ const fs = require('fs')
 const jwt = require('jsonwebtoken')
 const GoogleDrive = require('../google/GoogleDrive')
 const prisma = require('../prisma/client')
-const { $connect } = require('../prisma/client')
+const { $connect, job_partition } = require('../prisma/client')
 
 const gDrive = new GoogleDrive()
 
@@ -36,12 +36,15 @@ const typeDefs = gql`
       title: String!
       description: String!
       credits: Int!
+      labels: [String]!
       created_at: Date!
+      preview_images: [String]
    }
 
    type Query {
       users: [User]
       user(email: String!): User
+      viewJobs: [Job]!
    }
 
    type Mutation {
@@ -53,6 +56,7 @@ const typeDefs = gql`
          title: String!
          description: String!
          credits: Int!
+         labels: [String]!
          num_partitions: Int!
          files: [Upload]
       ): Job
@@ -74,6 +78,61 @@ const resolvers = {
             }
          })
          return user
+      },
+      viewJobs: async () => {
+         const job_owner_id = 4
+
+         const jobs = await prisma.job.findMany({
+            where: {
+               NOT: {
+                  job_owner_id: job_owner_id
+               }
+            }
+         })
+
+         // DISGUSTING
+         const getAvailableJobs = async () => {
+            let availableJobs = []
+
+            for (let i = 0; i < jobs.length; i++) {
+               const partitions = await prisma.job_partition.findMany({
+                  where: {
+                     AND: [{ job_id: jobs[i].job_id }, { is_full: false }]
+                  }
+               })
+
+               if (partitions.length > 0) {
+                  availableJobs.push(jobs[i])
+               }
+            }
+
+            return availableJobs
+         }
+         //END
+
+         const availableJobs = await getAvailableJobs()
+
+         const jobsWithImages = availableJobs.map(async (job) => {
+            const partition = await prisma.job_partition.findFirst({
+               where: {
+                  job_id: job.job_id
+               }
+            })
+
+            const previewImages = await prisma.job_image.findMany({
+               where: {
+                  partition_id: partition.partition_id
+               },
+               take: 5
+            })
+
+            job.preview_images = previewImages.map(
+               (jobImage) => jobImage.image_uri
+            )
+            return job
+         })
+
+         return jobsWithImages
       }
    },
 
@@ -114,15 +173,25 @@ const resolvers = {
 
       createJob: async (
          _,
-         { title, description, credits, num_partitions, files }
+         { title, description, credits, labels, num_partitions, files }
       ) => {
          // Job metadata
-         const job_owner_id = 3
+         const job_owner_id = 9
          const job = await prisma.job.create({
             data: { title, description, credits, job_owner_id }
          })
 
          if (!job) throw new Error('Error creating job.')
+
+         // Job labels
+         labels.forEach(async (label) => {
+            await prisma.job_label.create({
+               data: {
+                  job_id: job.job_id,
+                  label: label
+               }
+            })
+         })
 
          // Partition creation
          const encodedFiles = await Promise.all(files)
@@ -142,12 +211,14 @@ const resolvers = {
             )
 
             partitionInfo.ids.push(
-               await prisma.job_partition.create({
-                  data: {
-                     job_id: job.job_id,
-                     partition_number: i
-                  }
-               })
+               (
+                  await prisma.job_partition.create({
+                     data: {
+                        job_id: job.job_id,
+                        partition_number: i
+                     }
+                  })
+               ).partition_id
             )
          }
 
@@ -156,12 +227,14 @@ const resolvers = {
          )
 
          partitionInfo.ids.push(
-            await prisma.job_partition.create({
-               data: {
-                  job_id: job.job_id,
-                  partition_number: num_partitions - 1
-               }
-            })
+            (
+               await prisma.job_partition.create({
+                  data: {
+                     job_id: job.job_id,
+                     partition_number: num_partitions - 1
+                  }
+               })
+            ).partition_id
          )
 
          // Job images
@@ -189,7 +262,7 @@ const resolvers = {
                await prisma.job_image.create({
                   data: {
                      image_uri: urls[j + startIdx],
-                     partition_id: partitionInfo.ids[i].partition_id
+                     partition_id: partitionInfo.ids[i]
                   }
                })
             }
