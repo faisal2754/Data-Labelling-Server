@@ -1,4 +1,5 @@
-const { typeDefs, resolvers } = require('../schema/schema.js')
+const typeDefs = require('../schema/typeDefs.js')
+const resolvers = require('../schema/resolvers.js')
 const { getUser } = require('../utils/getUser.js')
 
 const config = {
