@@ -6,7 +6,6 @@ const fs = require('fs')
 const jwt = require('jsonwebtoken')
 const GoogleDrive = require('../google/GoogleDrive')
 const prisma = require('../prisma/client')
-const { $connect, job_partition } = require('../prisma/client')
 
 const gDrive = new GoogleDrive()
 
@@ -36,7 +35,6 @@ const typeDefs = gql`
       title: String!
       description: String!
       credits: Int!
-      labels: [String]!
       created_at: Date!
       preview_images: [String]
    }
@@ -50,8 +48,7 @@ const typeDefs = gql`
    type Mutation {
       register(username: String!, email: String!, password: String!): User
       login(email: String!, password: String!): User
-      storageUpload(file: [Upload], temp: String): [File]
-      streamUpload(file: Upload!): File
+      editProfile(username: String, password: String, avatar: String): User
       createJob(
          title: String!
          description: String!
@@ -60,6 +57,7 @@ const typeDefs = gql`
          num_partitions: Int!
          files: [Upload]
       ): Job
+      acceptJob(job_id: ID!): Boolean
    }
 `
 const resolvers = {
@@ -71,6 +69,7 @@ const resolvers = {
          const users = await prisma.user.findMany()
          return users
       },
+
       user: async (_, { email }) => {
          const user = await prisma.user.findFirst({
             where: {
@@ -79,6 +78,7 @@ const resolvers = {
          })
          return user
       },
+
       viewJobs: async () => {
          const job_owner_id = 4
 
@@ -153,6 +153,7 @@ const resolvers = {
 
          return user
       },
+
       login: async (_, { email, password }) => {
          const user = await prisma.user.findUnique({
             where: {
@@ -169,6 +170,39 @@ const resolvers = {
          user.jwt = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET)
 
          return user
+      },
+
+      editProfile: async (_, { username, password, avatar }) => {
+         const user_id = 11
+
+         let user = await prisma.user.findUnique({
+            where: { user_id }
+         })
+
+         if (!username) {
+            username = user.username
+         }
+         if (!password) {
+            password = user.password
+         }
+         if (!avatar) {
+            avatar = user.avatar
+         }
+
+         const hashedPass = await argon2.hash(password)
+
+         const updatedUser = await prisma.user.update({
+            where: { user_id },
+            data: {
+               username: username,
+               password: hashedPass,
+               avatar: avatar
+            }
+         })
+
+         if (!updatedUser) throw new Error('Error updating user')
+
+         return updatedUser
       },
 
       createJob: async (
@@ -273,33 +307,61 @@ const resolvers = {
          return job
       },
 
-      storageUpload: async (_, args) => {
-         let filenames = []
-         let streams = []
+      acceptJob: async (_, { job_id }) => {
+         // Find first available partition
+         const partition = await prisma.job_partition.findFirst({
+            where: {
+               AND: [
+                  {
+                     job_id: Number(job_id)
+                  },
+                  {
+                     is_full: false
+                  }
+               ]
+            }
+         })
 
-         const encodedFiles = await Promise.all(args.file)
+         if (!partition) return false
 
-         for (let i = 0; i < encodedFiles.length; i++) {
-            const { createReadStream, filename } = await encodedFiles[i]
+         // Find number of labels assigned to job
+         const numLabels = await prisma.job_label.count({
+            where: {
+               job_id: Number(job_id)
+            }
+         })
 
-            filenames.push(filename)
-            var stream = createReadStream()
-            streams.push(stream)
+         // Maximum number of people per partition
+         const maxNumLabellers = numLabels % 2 === 0 ? numLabels + 1 : numLabels
+
+         const numLabellersAssigned = await prisma.job_labeller.count({
+            where: {
+               partition_id: partition.partition_id
+            }
+         })
+
+         if (numLabellersAssigned === maxNumLabellers - 1) {
+            await prisma.job_partition.update({
+               where: {
+                  partition_id: partition.partition_id
+               },
+               data: {
+                  is_full: true
+               }
+            })
          }
 
-         const imgIds = await gDrive.uploadStreams(filenames, streams)
+         const newLabeller = await prisma.job_labeller.create({
+            data: {
+               job_id: Number(job_id),
+               user_id: 9,
+               partition_id: partition.partition_id
+            }
+         })
 
-         return encodedFiles
-      },
-      streamUpload: async (_, { file }) => {
-         const { createReadStream, filename, mimetype } = await file
-         const fileStream = createReadStream()
+         if (!newLabeller) return false
 
-         const result = await gDrive.uploadStream(filename, fileStream)
-
-         //https://drive.google.com/uc?id
-
-         return file
+         return true
       }
    }
 }

@@ -1,6 +1,7 @@
 const { ApolloServer } = require('apollo-server-express')
 const { graphqlUploadExpress } = require('graphql-upload')
 const express = require('express')
+const cors = require('cors')
 const config = require('./apollo/config')
 if (process.env.NODE_ENV !== 'production') {
    const dotenv = require('dotenv')
@@ -15,6 +16,7 @@ const startApolloServer = async () => {
 
    const app = express()
    app.use(graphqlUploadExpress())
+   app.use(cors())
    server.applyMiddleware({ app })
 
    await new Promise((resolve) => app.listen({ port }, resolve))
