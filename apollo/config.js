@@ -5,6 +5,7 @@ const { getUser } = require('../utils/getUser.js')
 const config = {
    typeDefs,
    resolvers,
+   introspection: true,
    context: async ({ req }) => {
       const authHeader = req.headers.authorization
       const user = await getUser(authHeader)
