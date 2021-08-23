@@ -17,7 +17,7 @@ const startApolloServer = async () => {
    const app = express()
    app.use(graphqlUploadExpress())
    app.use(cors())
-   server.applyMiddleware({ app })
+   server.applyMiddleware({ app, cors: false })
 
    await new Promise((resolve) => app.listen({ port }, resolve))
    console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
