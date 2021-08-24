@@ -24,6 +24,10 @@ const resolvers = {
    },
 
    Query: {
+      me: async (_, _, { user }) => {
+         return user
+      },
+
       users: async () => {
          const users = await prisma.user.findMany()
          return users
