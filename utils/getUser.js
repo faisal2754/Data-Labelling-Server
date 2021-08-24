@@ -21,7 +21,7 @@ const getUser = async (authHeader) => {
       })
 
       if (result) {
-         const user = await prisma.users.findUnique({
+         const user = await prisma.user.findUnique({
             where: {
                user_id: result.user_id
             }
