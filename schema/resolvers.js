@@ -11,6 +11,18 @@ const resolvers = {
    Upload: GraphQLUpload,
    Date: GraphQLDate,
 
+   Job: {
+      job_owner: async (parent) => {
+         const user = await prisma.user.findFirst({
+            where: {
+               user_id: parent.job_owner_id
+            }
+         })
+
+         return user
+      }
+   },
+
    Query: {
       users: async () => {
          const users = await prisma.user.findMany()
@@ -98,10 +110,12 @@ const resolvers = {
 
          user.jwt = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET)
 
+         res.cookie('jwt', user.jwt, { httpOnly: true })
+
          return user
       },
 
-      login: async (_, { email, password }) => {
+      login: async (_, { email, password }, { res }) => {
          const user = await prisma.user.findUnique({
             where: {
                email: email
@@ -115,6 +129,8 @@ const resolvers = {
          }
 
          user.jwt = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET)
+
+         res.cookie('jwt', user.jwt, { httpOnly: true })
 
          return user
       },

@@ -6,10 +6,11 @@ const config = {
    typeDefs,
    resolvers,
    introspection: true,
-   context: async ({ req }) => {
+   context: async ({ req, res }) => {
       const authHeader = req.headers.authorization
       const user = await getUser(authHeader)
-      return { user }
+
+      return { user, res }
    }
 }
 

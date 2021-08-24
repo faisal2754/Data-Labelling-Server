@@ -22,7 +22,7 @@ const typeDefs = gql`
 
    type Job {
       job_id: ID!
-      job_owner_id: Int!
+      job_owner: User!
       title: String!
       description: String!
       credits: Int!

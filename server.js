@@ -2,6 +2,7 @@ const { ApolloServer } = require('apollo-server-express')
 const { graphqlUploadExpress } = require('graphql-upload')
 const express = require('express')
 const cors = require('cors')
+const cookieParser = require('cookie-parser')
 const config = require('./apollo/config')
 if (process.env.NODE_ENV !== 'production') {
    const dotenv = require('dotenv')
@@ -15,6 +16,7 @@ const startApolloServer = async () => {
    await server.start()
 
    const app = express()
+   app.use(cookieParser())
    app.use(graphqlUploadExpress())
    app.use(cors())
    server.applyMiddleware({ app, cors: false })
