@@ -24,7 +24,7 @@ const resolvers = {
    },
 
    Query: {
-      me: async (_, _, { user }) => {
+      me: async (_, __, { user }) => {
          return user
       },
 
