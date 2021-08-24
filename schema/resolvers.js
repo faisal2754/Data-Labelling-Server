@@ -96,7 +96,7 @@ const resolvers = {
    },
 
    Mutation: {
-      register: async (_, { username, email, password }) => {
+      register: async (_, { username, email, password }, { res }) => {
          const hashedPass = await argon2.hash(password)
          const user = await prisma.user.create({
             data: {
