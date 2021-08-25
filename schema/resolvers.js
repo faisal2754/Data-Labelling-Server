@@ -134,7 +134,11 @@ const resolvers = {
 
          user.jwt = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET)
 
-         res.cookie('jwt', user.jwt, { httpOnly: true, sameSite: 'None' })
+         res.cookie('jwt', user.jwt, {
+            httpOnly: true,
+            sameSite: 'None',
+            secure: true
+         })
 
          return user
       },
