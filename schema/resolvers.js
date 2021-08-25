@@ -96,6 +96,42 @@ const resolvers = {
          })
 
          return jobsWithImages
+      },
+
+      labelJobInfo: async (_, { job_id }, { user }) => {
+         const jobTitle = (
+            await prisma.job.findFirst({
+               where: { job_id: Number(job_id) }
+            })
+         ).title
+
+         const partitionId = (
+            await prisma.job_labeller.findFirst({
+               where: {
+                  AND: [{ job_id: Number(job_id) }, { user_id: user.user_id }]
+               }
+            })
+         ).partition_id
+
+         const jobImages = await prisma.job_image.findMany({
+            where: { partition_id: partitionId }
+         })
+
+         const imageUris = jobImages.map((jobImage) => jobImage.image_uri)
+
+         const jobLabelsRecords = await prisma.job_label.findMany({
+            where: { job_id: Number(job_id) }
+         })
+
+         const jobLabels = jobLabelsRecords.map(
+            (jobLabelRecord) => jobLabelRecord.label
+         )
+
+         return {
+            title: jobTitle,
+            labels: jobLabels,
+            images: imageUris
+         }
       }
    },
 

@@ -30,11 +30,18 @@ const typeDefs = gql`
       preview_images: [String]
    }
 
+   type LabelJobInfo {
+      title: String!
+      labels: [String]!
+      images: [String]!
+   }
+
    type Query {
       me: User
       users: [User]
       user(email: String!): User
       viewJobs: [Job]
+      labelJobInfo(job_id: ID!): LabelJobInfo
    }
 
    type Mutation {
