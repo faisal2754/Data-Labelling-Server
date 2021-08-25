@@ -18,7 +18,12 @@ const startApolloServer = async () => {
    const app = express()
    app.use(cookieParser())
    app.use(graphqlUploadExpress())
-   app.use(cors())
+   app.use(
+      cors({
+         origin: 'http://localhost:3000',
+         credentials: 'include'
+      })
+   )
    server.applyMiddleware({ app, cors: false })
 
    await new Promise((resolve) => app.listen({ port }, resolve))
