@@ -88,7 +88,7 @@ const mutations = {
       { user }
    ) => {
       // Job metadata
-      const job_owner_id = user?.user_id
+      const job_owner_id = 1
       const job = await prisma.job.create({
          data: { title, description, credits, job_owner_id }
       })
