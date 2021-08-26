@@ -53,12 +53,8 @@ const mutations = {
       return user
    },
 
-   editProfile: async (_, { username, password, avatar }) => {
-      const user_id = 11
-
-      let user = await prisma.user.findUnique({
-         where: { user_id }
-      })
+   editProfile: async (_, { username, password, avatar }, { user }) => {
+      const user_id = user?.user_id
 
       if (!username) {
          username = user.username
@@ -88,10 +84,11 @@ const mutations = {
 
    createJob: async (
       _,
-      { title, description, credits, labels, num_partitions, files }
+      { title, description, credits, labels, num_partitions, files },
+      { user }
    ) => {
       // Job metadata
-      const job_owner_id = 9
+      const job_owner_id = user?.user_id
       const job = await prisma.job.create({
          data: { title, description, credits, job_owner_id }
       })
@@ -188,7 +185,9 @@ const mutations = {
       return job
    },
 
-   acceptJob: async (_, { job_id }) => {
+   acceptJob: async (_, { job_id }, { user }) => {
+      const currentUserId = user?.user_id
+
       // Find first available partition
       const partition = await prisma.job_partition.findFirst({
          where: {
@@ -235,7 +234,7 @@ const mutations = {
       const newLabeller = await prisma.job_labeller.create({
          data: {
             job_id: Number(job_id),
-            user_id: 9,
+            user_id: currentUserId,
             partition_id: partition.partition_id
          }
       })
