@@ -94,6 +94,7 @@ const queries = {
          where: { partition_id: partitionId }
       })
 
+      const imageIds = jobImages.map((jobImage) => jobImage.image_id)
       const imageUris = jobImages.map((jobImage) => jobImage.image_uri)
 
       const jobLabelsRecords = await prisma.job_label.findMany({
@@ -107,6 +108,7 @@ const queries = {
       return {
          title: jobTitle,
          labels: jobLabels,
+         imageIds: imageIds,
          images: imageUris
       }
    }

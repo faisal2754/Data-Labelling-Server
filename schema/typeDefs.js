@@ -33,6 +33,7 @@ const typeDefs = gql`
    type LabelJobInfo {
       title: String!
       labels: [String]!
+      image_ids: [ID]!
       images: [String]!
    }
 
