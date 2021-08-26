@@ -108,7 +108,7 @@ const queries = {
       return {
          title: jobTitle,
          labels: jobLabels,
-         imageIds: imageIds,
+         image_ids: imageIds,
          images: imageUris
       }
    }
