@@ -20,16 +20,17 @@ model user {
 }
 
 model job {
-  job_id        Int             @id @default(autoincrement())
-  title         String
-  created_at    DateTime        @default(now())
-  description   String
-  credits       Int
-  job_owner_id  Int
-  job_owner     user            @relation(fields: [job_owner_id], references: [user_id])
-  job_labeller  job_labeller[]
-  job_label     job_label[]
-  job_partition job_partition[]
+  job_id                  Int             @id @default(autoincrement())
+  title                   String
+  created_at              DateTime        @default(now())
+  description             String
+  credits                 Int
+  labellers_per_partition Int
+  job_owner_id            Int
+  job_owner               user            @relation(fields: [job_owner_id], references: [user_id])
+  job_labeller            job_labeller[]
+  job_label               job_label[]
+  job_partition           job_partition[]
 }
 
 model job_labeller {
@@ -72,6 +73,8 @@ model job_partition {
   partition_id     Int            @id @default(autoincrement())
   partition_number Int
   is_full          Boolean        @default(false)
+  is_complete      Boolean        @default(false)
+  complete_counter Int            @default(0)
   job_id           Int
   job              job            @relation(fields: [job_id], references: [job_id])
   job_labeller     job_labeller[]

@@ -88,9 +88,19 @@ const mutations = {
       { user }
    ) => {
       // Job metadata
-      const job_owner_id = 1
+      const job_owner_id = 16
+      const numLabels = labels.length
+      const maxNumLabellers =
+         numLabels % 2 === 0 ? numLabels + 1 : numLabels + 2
+
       const job = await prisma.job.create({
-         data: { title, description, credits, job_owner_id }
+         data: {
+            title,
+            description,
+            credits,
+            job_owner_id,
+            labellers_per_partition: maxNumLabellers
+         }
       })
 
       if (!job) throw new Error('Error creating job.')
@@ -212,7 +222,8 @@ const mutations = {
       })
 
       // Maximum number of people per partition
-      const maxNumLabellers = numLabels % 2 === 0 ? numLabels + 1 : numLabels
+      const maxNumLabellers =
+         numLabels % 2 === 0 ? numLabels + 1 : numLabels + 2
 
       const numLabellersAssigned = await prisma.job_labeller.count({
          where: {
@@ -242,6 +253,10 @@ const mutations = {
       if (!newLabeller) return false
 
       return true
+   },
+
+   saveState: async (_, { image_ids, labels }) => {
+      const jobOwnerId = 1
    }
 }
 
