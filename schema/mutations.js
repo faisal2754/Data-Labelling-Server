@@ -255,8 +255,64 @@ const mutations = {
       return true
    },
 
-   saveState: async (_, { image_ids, labels }) => {
-      const jobOwnerId = 1
+   saveState: async (
+      _,
+      { image_ids, labels, partition_id, is_complete = false }
+   ) => {
+      const userId = 16
+
+      for (let i = 0; i < image_ids.length; i++) {
+         const image_id = Number(image_ids[i])
+         const label = labels[i]
+
+         await prisma.image_label.upsert({
+            create: {
+               user_id: userId,
+               image_id,
+               label
+            },
+            update: { label },
+            where: {
+               user_id_image_id: { user_id: userId, image_id }
+            }
+         })
+      }
+
+      if (is_complete) {
+         const complete_counter = (
+            await prisma.job_partition.findFirst({
+               where: { partition_id: Number(partition_id) }
+            })
+         ).complete_counter
+
+         await prisma.job_partition.update({
+            where: { partition_id: Number(partition_id) },
+            data: {
+               complete_counter: Number(complete_counter) + 1
+            }
+         })
+
+         const job_id = (
+            await prisma.job_partition.findFirst({
+               where: { partition_id: Number(partition_id) }
+            })
+         ).job_id
+
+         const magic_number = (
+            await prisma.job.findFirst({
+               where: { job_id }
+            })
+         ).labellers_per_partition
+
+         if (complete_counter + 1 === magic_number) {
+            await prisma.job_partition.update({
+               where: { partition_id: Number(partition_id) },
+               data: { is_complete: true }
+            })
+         }
+      }
+
+      return true
    }
 }
 

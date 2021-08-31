@@ -58,7 +58,12 @@ const typeDefs = gql`
          files: [Upload]
       ): Job
       acceptJob(job_id: ID!): Boolean
-      saveState(image_ids: [ID]!, label: [String]!): Boolean
+      saveState(
+         image_ids: [ID]!
+         labels: [String]!
+         partition_id: ID
+         is_complete: Boolean
+      ): Boolean
    }
 `
 
