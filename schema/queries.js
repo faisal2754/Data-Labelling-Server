@@ -85,7 +85,7 @@ const queries = {
       const partitionId = (
          await prisma.job_labeller.findFirst({
             where: {
-               AND: [{ job_id: Number(job_id) }, { user_id: 1 }]
+               AND: [{ job_id: Number(job_id) }, { user_id: 16 }]
             }
          })
       ).partition_id
