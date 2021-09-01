@@ -123,6 +123,7 @@ const queries = {
       })
 
       let imageIds = imageIdArr.map((imgId) => imgId.image_id)
+      let removeImageIds = []
 
       const imgIdsLength = imageIds.length
 
@@ -139,8 +140,13 @@ const queries = {
          if (labelRecord) {
             labels.push(labelRecord.label)
          } else {
-            imageIds = imageIds.filter((id) => id !== imgId)
+            removeImageIds.push(imgId)
          }
+      }
+
+      for (let j = 0; j < removeImageIds.length; j++) {
+         const imgId = removeImageIds[j]
+         imageIds = imageIds.filter((id) => id !== imgId)
       }
 
       return { image_ids: imageIds, labels }
