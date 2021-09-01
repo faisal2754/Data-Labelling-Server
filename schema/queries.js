@@ -106,6 +106,7 @@ const queries = {
       )
 
       return {
+         partition_id: partitionId,
          title: jobTitle,
          labels: jobLabels,
          image_ids: imageIds,

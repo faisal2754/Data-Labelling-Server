@@ -31,6 +31,7 @@ const typeDefs = gql`
    }
 
    type LabelJobInfo {
+      partition_id: ID!
       title: String!
       labels: [String]!
       image_ids: [ID]!
