@@ -111,6 +111,38 @@ const queries = {
          image_ids: imageIds,
          images: imageUris
       }
+   },
+
+   labelJobState: async (_, { partition_id }, { user }) => {
+      const jobLabellerId = 16 // To be replaced
+
+      const imageIdArr = await prisma.job_image.findMany({
+         where: { partition_id: Number(partition_id) },
+         select: { image_id: true }
+      })
+
+      let imageIds = imageIdArr.map((imgId) => imgId.image_id)
+
+      const imgIdsLength = imageIds.length
+
+      let labels = []
+      for (let i = 0; i < imgIdsLength; i++) {
+         const imgId = imageIds[i]
+         const labelRecord = await prisma.image_label.findFirst({
+            where: {
+               user_id: jobLabellerId,
+               image_id: imgId
+            }
+         })
+
+         if (labelRecord) {
+            labels.push(labelRecord.label)
+         } else {
+            imageIds = imageIds.filter((id) => id !== imgId)
+         }
+      }
+
+      return { image_ids: imageIds, labels }
    }
 }
 

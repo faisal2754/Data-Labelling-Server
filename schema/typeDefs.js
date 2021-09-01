@@ -37,12 +37,18 @@ const typeDefs = gql`
       images: [String]!
    }
 
+   type LabelJobState {
+      image_ids: [ID]!
+      labels: [String]!
+   }
+
    type Query {
       me: User
       users: [User]
       user(email: String!): User
       viewJobs: [Job]
       labelJobInfo(job_id: ID!): LabelJobInfo
+      labelJobState(partition_id: ID!): LabelJobState
    }
 
    type Mutation {
