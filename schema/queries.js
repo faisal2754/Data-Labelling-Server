@@ -150,6 +150,44 @@ const queries = {
       }
 
       return { image_ids: imageIds, labels }
+   },
+
+   ownedJobs: async (_, __, { user }) => {
+      const userId = 16
+
+      const jobs = await prisma.job.findMany({
+         where: {
+            job_owner_id: userId
+         }
+      })
+
+      return jobs
+   },
+
+   acceptedJobs: async (_, __, { user }) => {
+      const userId = 16
+
+      const acceptedJobRecords = await prisma.job_labeller.findMany({
+         where: {
+            user_id: userId
+         },
+         distinct: ['job_id'],
+         select: {
+            job_id: true
+         }
+      })
+
+      const acceptedJobIds = acceptedJobRecords.map((record) => record.job_id)
+
+      const acceptedJobs = await prisma.job.findMany({
+         where: {
+            job_id: {
+               in: acceptedJobIds
+            }
+         }
+      })
+
+      return acceptedJobs
    }
 }
 

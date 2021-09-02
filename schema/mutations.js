@@ -196,7 +196,8 @@ const mutations = {
    },
 
    acceptJob: async (_, { job_id }, { user }) => {
-      const currentUserId = user?.user_id
+      //const currentUserId = user?.user_id
+      const currentUserId = 16
 
       // Find first available partition
       const partition = await prisma.job_partition.findFirst({

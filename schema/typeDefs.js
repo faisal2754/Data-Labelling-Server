@@ -50,6 +50,8 @@ const typeDefs = gql`
       viewJobs: [Job]
       labelJobInfo(job_id: ID!): LabelJobInfo
       labelJobState(partition_id: ID!): LabelJobState
+      ownedJobs: [Job]
+      acceptedJobs: [Job]
    }
 
    type Mutation {
