@@ -64,6 +64,8 @@ const queries = {
    },
 
    labelJobInfo: async (_, { job_id }, { user }) => {
+      const userId = 33
+
       const jobTitle = (
          await prisma.job.findFirst({
             where: { job_id: Number(job_id) }
@@ -73,7 +75,7 @@ const queries = {
       const partitionId = (
          await prisma.job_labeller.findFirst({
             where: {
-               AND: [{ job_id: Number(job_id) }, { user_id: user.user_id }]
+               AND: [{ job_id: Number(job_id) }, { user_id: uuserId }]
             }
          })
       ).partition_id
@@ -103,7 +105,8 @@ const queries = {
    },
 
    labelJobState: async (_, { partition_id }, { user }) => {
-      const jobLabellerId = user.user_id
+      // const jobLabellerId = user.user_id
+      const jobLabellerId = 33
 
       const imageIdArr = await prisma.job_image.findMany({
          where: { partition_id: Number(partition_id) },
