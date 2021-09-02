@@ -10,7 +10,8 @@
     "docker:up": "docker-compose -f tests/docker-compose.yml up -d",
     "docker:down": "docker-compose -f tests/docker-compose.yml down",
     "test": "npm run docker:up && npm run migrate:test && jest -i --no-cache  --detectOpenHandles --runInBand --forceExit",
-    "test:dev": "npm run migrate:test && jest --no-cache  --detectOpenHandles --runInBand --forceExit"
+    "test:dev": "npm run migrate:test && jest --no-cache  --detectOpenHandles --runInBand --forceExit",
+    "test:dev:win": "npm run migrate:test && jest -i --no-cache  --detectOpenHandles --runInBand --forceExit"
   },
   "keywords": [],
   "author": "",
@@ -27,12 +28,14 @@
     "graphql-date": "^1.0.3",
     "graphql-upload": "^12.0.0",
     "jsonwebtoken": "^8.5.1",
-    "nodemon": "^2.0.12"
+    "nodemon": "^2.0.12",
+    "prisma": "^2.30.3"
   },
   "devDependencies": {
     "apollo-server": "^3.3.0",
     "apollo-server-integration-testing": "^3.0.0",
     "dotenv": "^10.0.0",
+    "dotenv-cli": "^4.0.0",
     "jest": "^27.1.0"
   }
 }
