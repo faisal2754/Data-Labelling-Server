@@ -54,7 +54,7 @@ const mutations = {
    },
 
    editProfile: async (_, { username, password, avatar }, { user }) => {
-      const user_id = user?.user_id
+      const user_id = user.user_id
 
       if (!username) {
          username = user.username
@@ -88,7 +88,7 @@ const mutations = {
       { user }
    ) => {
       // Job metadata
-      const job_owner_id = 16
+      const job_owner_id = user.user_id
       const numLabels = labels.length
       const maxNumLabellers =
          numLabels % 2 === 0 ? numLabels + 1 : numLabels + 2
@@ -196,8 +196,7 @@ const mutations = {
    },
 
    acceptJob: async (_, { job_id }, { user }) => {
-      //const currentUserId = user?.user_id
-      const currentUserId = 16
+      const currentUserId = user.user_id
 
       // Find first available partition
       const partition = await prisma.job_partition.findFirst({
@@ -258,9 +257,10 @@ const mutations = {
 
    saveState: async (
       _,
-      { image_ids, labels, partition_id, is_complete = false }
+      { image_ids, labels, partition_id, is_complete = false },
+      { user }
    ) => {
-      const userId = 16
+      const userId = user.user_id
 
       for (let i = 0; i < image_ids.length; i++) {
          const image_id = Number(image_ids[i])

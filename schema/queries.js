@@ -1,26 +1,14 @@
 const prisma = require('../prisma/client')
 
 const queries = {
+   bruh: () => 'bruh',
+
    me: async (_, __, { user }) => {
       return user
    },
 
-   users: async () => {
-      const users = await prisma.user.findMany()
-      return users
-   },
-
-   user: async (_, { email }) => {
-      const user = await prisma.user.findFirst({
-         where: {
-            email: email
-         }
-      })
-      return user
-   },
-
-   viewJobs: async () => {
-      const job_owner_id = 4
+   viewJobs: async (_, __, { user }) => {
+      const job_owner_id = user.user_id
 
       const jobs = await prisma.job.findMany({
          where: {
@@ -85,7 +73,7 @@ const queries = {
       const partitionId = (
          await prisma.job_labeller.findFirst({
             where: {
-               AND: [{ job_id: Number(job_id) }, { user_id: 16 }]
+               AND: [{ job_id: Number(job_id) }, { user_id: user.user_id }]
             }
          })
       ).partition_id
@@ -115,7 +103,7 @@ const queries = {
    },
 
    labelJobState: async (_, { partition_id }, { user }) => {
-      const jobLabellerId = 16 // To be replaced
+      const jobLabellerId = user.user_id
 
       const imageIdArr = await prisma.job_image.findMany({
          where: { partition_id: Number(partition_id) },
@@ -153,7 +141,7 @@ const queries = {
    },
 
    ownedJobs: async (_, __, { user }) => {
-      const userId = 16
+      const userId = user.user_id
 
       const jobs = await prisma.job.findMany({
          where: {
@@ -165,7 +153,7 @@ const queries = {
    },
 
    acceptedJobs: async (_, __, { user }) => {
-      const userId = 16
+      const userId = user.user_id
 
       const acceptedJobRecords = await prisma.job_labeller.findMany({
          where: {
