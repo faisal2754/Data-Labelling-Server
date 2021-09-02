@@ -57,17 +57,16 @@ describe('User Authentication', () => {
 describe('Bruh should bruh', () => {
    it('should return bruh', async () => {
       const result = await query(BRUH)
-      console.log(result)
       expect(result.data.bruh).toEqual('bruh')
    })
 })
 
 afterAll(async () => {
-   // await prisma.image_label.deleteMany()
-   // await prisma.job_image.deleteMany()
-   // await prisma.job_partition.deleteMany()
-   // await prisma.job_label.deleteMany()
-   // await prisma.job_labeller.deleteMany()
+   await prisma.image_label.deleteMany()
+   await prisma.job_image.deleteMany()
+   await prisma.job_labeller.deleteMany()
+   await prisma.job_partition.deleteMany()
+   await prisma.job_label.deleteMany()
    await prisma.job.deleteMany()
    await prisma.user.deleteMany()
    await prisma.$disconnect()
