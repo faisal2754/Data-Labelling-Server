@@ -20,8 +20,6 @@ const queries = {
            })
          : await prisma.job.findMany()
 
-      console.log(jobs)
-
       // DISGUSTING
       const getAvailableJobs = async () => {
          let availableJobs = []
