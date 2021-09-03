@@ -4,6 +4,7 @@ const REGISTER = gql`
    mutation Register($username: String!, $email: String!, $password: String!) {
       register(username: $username, email: $email, password: $password) {
          email
+         jwt
       }
    }
 `
@@ -16,4 +17,24 @@ const LOGIN = gql`
    }
 `
 
-module.exports = { REGISTER, LOGIN }
+const CREATE_JOB = gql`
+   mutation CreateJob(
+      $title: String!
+      $description: String!
+      $credits: Int!
+      $labels: [String]!
+      $num_partitions: Int!
+   ) {
+      createJob(
+         title: $title
+         description: $description
+         credits: $credits
+         labels: $labels
+         num_partitions: $num_partitions
+      ) {
+         job_id
+      }
+   }
+`
+
+module.exports = { REGISTER, LOGIN, CREATE_JOB }

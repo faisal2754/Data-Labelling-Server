@@ -11,7 +11,7 @@
     "docker:up": "docker-compose -f tests/docker-compose.yml up -d",
     "docker:down": "docker-compose -f tests/docker-compose.yml down",
     "test:actions": "npm run docker:up && npm run migrate:actions && jest -i --no-cache  --detectOpenHandles --runInBand --forceExit",
-    "test:dev": "npm run migrate:test && jest --no-cache  --detectOpenHandles --runInBand --forceExit"
+    "test:dev": "npm run migrate:test && jest --coverage --no-cache  --detectOpenHandles --runInBand --forceExit"
   },
   "keywords": [],
   "author": "",
@@ -32,10 +32,15 @@
     "prisma": "^2.30.3"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.15.4",
     "apollo-server": "^3.3.0",
     "apollo-server-integration-testing": "^3.0.0",
+    "axios": "^0.21.1",
     "dotenv": "^10.0.0",
     "dotenv-cli": "^4.0.0",
-    "jest": "^27.1.0"
+    "fetch": "^1.1.0",
+    "form-data": "^4.0.0",
+    "jest": "^27.1.0",
+    "node-fetch": "^3.0.0"
   }
 }

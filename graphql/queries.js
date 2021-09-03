@@ -1,17 +1,25 @@
 const { gql } = require('apollo-server-express')
 
 const BRUH = gql`
-   query {
+   query Bruh {
       bruh
    }
 `
 
-const GET_USERS = gql`
-   query {
-      users {
-         username
+const ME = gql`
+   query Me {
+      me {
+         email
       }
    }
 `
 
-module.exports = { BRUH, GET_USERS }
+const VIEW_JOBS = gql`
+   query ViewJobs {
+      viewJobs {
+         job_id
+      }
+   }
+`
+
+module.exports = { BRUH, ME, VIEW_JOBS }

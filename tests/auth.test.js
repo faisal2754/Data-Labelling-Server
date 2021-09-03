@@ -19,7 +19,7 @@ beforeAll(async () => {
    mutate = testClient.mutate
 })
 
-describe('User Authentication', () => {
+xdescribe('User Authentication', () => {
    it('should allow users to register', async () => {
       const result = await mutate(REGISTER, {
          variables: {
@@ -49,13 +49,6 @@ describe('User Authentication', () => {
       const { jwt } = result.data.login
 
       expect(jwt).toBeDefined()
-   })
-})
-
-describe('Bruh should bruh', () => {
-   it('should return bruh', async () => {
-      const result = await query(BRUH)
-      expect(result.data.bruh).toEqual('bruh')
    })
 })
 
