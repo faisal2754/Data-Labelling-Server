@@ -5,8 +5,6 @@ const { REGISTER, LOGIN } = require('../graphql/mutations')
 const { BRUH } = require('../graphql/queries')
 const prisma = require('../prisma/client')
 
-jest.setTimeout(30000)
-
 let apolloServer, query, mutate
 
 beforeAll(async () => {
