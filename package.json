@@ -17,7 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^2.30.2",
+    "@prisma/client": "^2.30.3",
     "apollo-server-express": "^3.3.0",
     "argon2": "^0.28.2",
     "cookie-parser": "^1.4.5",

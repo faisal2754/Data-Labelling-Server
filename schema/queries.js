@@ -8,15 +8,19 @@ const queries = {
    },
 
    viewJobs: async (_, __, { user }) => {
-      const job_owner_id = user.user_id
+      const job_owner_id = user?.user_id
 
-      const jobs = await prisma.job.findMany({
-         where: {
-            NOT: {
-               job_owner_id: job_owner_id
-            }
-         }
-      })
+      const jobs = job_owner_id
+         ? await prisma.job.findMany({
+              where: {
+                 NOT: {
+                    job_owner_id: job_owner_id
+                 }
+              }
+           })
+         : await prisma.job.findMany()
+
+      console.log(jobs)
 
       // DISGUSTING
       const getAvailableJobs = async () => {
