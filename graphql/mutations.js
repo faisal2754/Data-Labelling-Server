@@ -41,10 +41,38 @@ const EDIT_PROFILE = gql`
    mutation EditProfile($username: String, $password: String, $avatar: String) {
       editProfile(username: $username, password: $password, avatar: $avatar) {
          username
-         password
          avatar
       }
    }
 `
 
-module.exports = { REGISTER, LOGIN, CREATE_JOB, EDIT_PROFILE }
+const ACCEPT_JOB = gql`
+   mutation AcceptJob($job_id: ID!) {
+      acceptJob(job_id: $job_id)
+   }
+`
+
+const SAVE_STATE = gql`
+   mutation SaveState(
+      $image_ids: [ID]!
+      $labels: [String]!
+      $partition_id: ID
+      $is_complete: Boolean
+   ) {
+      saveState(
+         image_ids: $image_ids
+         labels: $labels
+         partition_id: $partition_id
+         is_complete: $is_complete
+      )
+   }
+`
+
+module.exports = {
+   REGISTER,
+   LOGIN,
+   CREATE_JOB,
+   EDIT_PROFILE,
+   ACCEPT_JOB,
+   SAVE_STATE
+}

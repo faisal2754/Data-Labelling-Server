@@ -3,8 +3,8 @@ const express = require('express')
 const { graphqlUploadExpress } = require('graphql-upload')
 const { createTestClient } = require('apollo-server-integration-testing')
 const config = require('../apollo/config')
-const { CREATE_JOB, REGISTER } = require('../graphql/mutations')
-const { VIEW_JOB, VIEW_JOBS } = require('../graphql/queries')
+const { LABEL_JOB_INFO } = require('../graphql/queries')
+const { REGISTER, ACCEPT_JOB, SAVE_STATE } = require('../graphql/mutations')
 const prisma = require('../prisma/client')
 const FormData = require('form-data')
 const fs = require('fs')
@@ -21,7 +21,7 @@ beforeAll(async () => {
    app.use(graphqlUploadExpress())
    apolloServer.applyMiddleware({ app })
 
-   await new Promise((resolve) => app.listen({ port: 4000 }, resolve))
+   await new Promise((resolve) => app.listen({ port: 4002 }, resolve))
 
    const testClient = createTestClient({
       apolloServer
@@ -44,10 +44,10 @@ afterAll(async () => {
    await apolloServer.stop()
 })
 
-xdescribe('ViewJobs returns all the existing jobs', () => {
-   let jwt, newJobId
+describe('Should save a jobs state', () => {
+   let jwt, jobId, partitionId, imageIds, labels
 
-   it('should register a new user', async () => {
+   it('registers a new user', async () => {
       const result = await mutate(REGISTER, {
          variables: {
             username: 'jest',
@@ -89,13 +89,21 @@ xdescribe('ViewJobs returns all the existing jobs', () => {
          'map',
          JSON.stringify({
             0: ['variables.files.0'],
-            1: ['variables.files.1']
+            1: ['variables.files.1'],
+            2: ['variables.files.2'],
+            3: ['variables.files.3']
          })
       )
       form.append('0', fs.createReadStream('tests/temp.txt'), {
          filename: 'temp.txt'
       })
       form.append('1', fs.createReadStream('tests/temp.txt'), {
+         filename: 'temp.txt'
+      })
+      form.append('2', fs.createReadStream('tests/temp.txt'), {
+         filename: 'temp.txt'
+      })
+      form.append('3', fs.createReadStream('tests/temp.txt'), {
          filename: 'temp.txt'
       })
 
@@ -107,16 +115,16 @@ xdescribe('ViewJobs returns all the existing jobs', () => {
          form.getHeaders()
       )
 
-      const res = await axios.post('http://localhost:4000/graphql', form, {
+      const res = await axios.post('http://localhost:4002/graphql', form, {
          headers
       })
 
-      newJobId = res.data.data.createJob.job_id
+      jobId = res.data.data.createJob.job_id
 
-      ok(newJobId)
+      ok(jobId)
    })
 
-   it('should return no jobs because you own them', async () => {
+   it('should accept a job', async () => {
       setOptions({
          request: {
             headers: {
@@ -125,24 +133,61 @@ xdescribe('ViewJobs returns all the existing jobs', () => {
          }
       })
 
-      const result = await query(VIEW_JOBS)
-      const jobs = result.data.viewJobs
+      const result = await mutate(ACCEPT_JOB, {
+         variables: {
+            job_id: jobId
+         }
+      })
 
-      expect(jobs).toEqual([])
+      expect(result).toEqual({
+         data: {
+            acceptJob: true
+         }
+      })
    })
 
-   it('should return all the jobs in the db', async () => {
+   it("should return a job's information", async () => {
       setOptions({
          request: {
             headers: {
-               authorization: ''
+               authorization: `Bearer ${jwt}`
             }
          }
       })
 
-      const result = await query(VIEW_JOBS)
-      const jobs = result.data.viewJobs
+      const result = await query(LABEL_JOB_INFO, {
+         variables: {
+            job_id: jobId
+         }
+      })
 
-      expect(jobs[0].job_id).toEqual(newJobId)
+      partitionId = result.data.labelJobInfo.partition_id
+      imageIds = result.data.labelJobInfo.image_ids
+      labels = result.data.labelJobInfo.labels
+
+      ok(partitionId)
+   })
+
+   it('should save a jobs state', async () => {
+      const imageLabels = [labels[0], labels[1]]
+
+      setOptions({
+         request: {
+            headers: {
+               authorization: `Bearer ${jwt}`
+            }
+         }
+      })
+
+      const result = await mutate(SAVE_STATE, {
+         variables: {
+            image_ids: imageIds,
+            labels: imageLabels,
+            partition_id: partitionId,
+            is_complete: true
+         }
+      })
+
+      ok(result)
    })
 })

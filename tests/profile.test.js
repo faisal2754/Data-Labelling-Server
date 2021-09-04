@@ -1,7 +1,6 @@
 const { ApolloServer } = require('apollo-server-express')
 const { createTestClient } = require('apollo-server-integration-testing')
 const config = require('../apollo/config')
-const argon2 = require('argon2')
 const { REGISTER, EDIT_PROFILE } = require('../graphql/mutations')
 const prisma = require('../prisma/client')
 
@@ -32,7 +31,7 @@ afterAll(async () => {
    await apolloServer.stop()
 })
 
-xdescribe('EditProfile lets users modify their account info', () => {
+describe('EditProfile lets users modify their account info', () => {
    let jwt
 
    it('registers a new user', async () => {
@@ -79,7 +78,6 @@ xdescribe('EditProfile lets users modify their account info', () => {
          data: {
             editProfile: {
                username: newDetails.username,
-               password: await argon2.hash(newDetails.password),
                avatar: newDetails.avatar
             }
          }

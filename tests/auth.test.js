@@ -30,7 +30,7 @@ afterAll(async () => {
    await apolloServer.stop()
 })
 
-xdescribe('User Authentication', () => {
+describe('User Authentication', () => {
    it('should allow users to register', async () => {
       const result = await mutate(REGISTER, {
          variables: {

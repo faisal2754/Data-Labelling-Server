@@ -260,8 +260,7 @@ const mutations = {
       { image_ids, labels, partition_id, is_complete = false },
       { user }
    ) => {
-      const userId = 38
-
+      const userId = user.user_id
       for (let i = 0; i < image_ids.length; i++) {
          const image_id = Number(image_ids[i])
          const label = labels[i]
