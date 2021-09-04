@@ -11,7 +11,7 @@
     "docker:up": "docker-compose -f tests/docker-compose.yml up -d",
     "docker:down": "docker-compose -f tests/docker-compose.yml down",
     "test:actions": "npm run docker:up && npm run migrate:actions && jest -i --no-cache  --detectOpenHandles --runInBand --forceExit",
-    "test:dev": "npm run migrate:test && jest --coverage --no-cache  --detectOpenHandles --runInBand --forceExit"
+    "test:dev": "npm run migrate:test && jest --no-cache  --detectOpenHandles --runInBand --forceExit"
   },
   "keywords": [],
   "author": "",

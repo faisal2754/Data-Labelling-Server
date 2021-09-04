@@ -37,4 +37,14 @@ const CREATE_JOB = gql`
    }
 `
 
-module.exports = { REGISTER, LOGIN, CREATE_JOB }
+const EDIT_PROFILE = gql`
+   mutation EditProfile($username: String, $password: String, $avatar: String) {
+      editProfile(username: $username, password: $password, avatar: $avatar) {
+         username
+         password
+         avatar
+      }
+   }
+`
+
+module.exports = { REGISTER, LOGIN, CREATE_JOB, EDIT_PROFILE }

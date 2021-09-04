@@ -32,7 +32,7 @@ afterAll(async () => {
    await apolloServer.stop()
 })
 
-describe('Me checks the current logged in user', () => {
+xdescribe('Me checks the current logged in user', () => {
    let jwt
    it('should register a new user', async () => {
       const result = await mutate(REGISTER, {

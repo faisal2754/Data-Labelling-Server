@@ -44,7 +44,7 @@ afterAll(async () => {
    await apolloServer.stop()
 })
 
-describe('ViewJobs returns all the existing jobs', () => {
+xdescribe('ViewJobs returns all the existing jobs', () => {
    let jwt, newJobId
 
    it('should register a new user', async () => {
