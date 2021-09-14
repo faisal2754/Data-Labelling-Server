@@ -20,7 +20,7 @@ const startApolloServer = async () => {
       // Website you wish to allow to connect
       res.setHeader(
          'Access-Control-Allow-Origin',
-         'https://faisal2754.github.io/Web-Data-Labelling-v2'
+         'https://faisal2754.github.io'
       )
 
       // Request methods you wish to allow
@@ -42,7 +42,7 @@ const startApolloServer = async () => {
       cors({
          origin: [
             'http://localhost:3000',
-            'https://faisal2754.github.io/Web-Data-Labelling-v2',
+            'https://faisal2754.github.io',
             'http://127.0.0.1:5500'
          ],
          credentials: true
