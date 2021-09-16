@@ -38,16 +38,16 @@ const startApolloServer = async () => {
    })
    app.use(cookieParser())
    app.use(graphqlUploadExpress())
-   app.use(
-      cors({
-         origin: [
-            'http://localhost:3000',
-            'https://faisal2754.github.io',
-            'http://127.0.0.1:5500'
-         ],
-         credentials: true
-      })
-   )
+   // app.use(
+   //    cors({
+   //       origin: [
+   //          'http://localhost:3000',
+   //          'https://faisal2754.github.io',
+   //          'http://127.0.0.1:5500'
+   //       ],
+   //       credentials: true
+   //    })
+   // )
    server.applyMiddleware({ app, cors: false })
 
    await new Promise((resolve) => app.listen({ port }, resolve))
