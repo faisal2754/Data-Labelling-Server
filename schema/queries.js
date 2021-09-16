@@ -13,12 +13,23 @@ const queries = {
       const jobs = job_owner_id
          ? await prisma.job.findMany({
               where: {
-                 NOT: {
-                    job_owner_id: job_owner_id
-                 }
+                 AND: [
+                    {
+                       NOT: {
+                          job_owner_id: job_owner_id
+                       }
+                    },
+                    {
+                       status: 'active'
+                    }
+                 ]
               }
            })
-         : await prisma.job.findMany()
+         : await prisma.job.findMany({
+              where: {
+                 status: 'active'
+              }
+           })
 
       // DISGUSTING
       const getAvailableJobs = async () => {

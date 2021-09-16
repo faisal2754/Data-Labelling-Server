@@ -73,6 +73,7 @@ const typeDefs = gql`
          partition_id: ID
          is_complete: Boolean
       ): Boolean
+      deleteJob(job_id: ID!): Boolean
    }
 `
 

@@ -313,6 +313,74 @@ const mutations = {
       }
 
       return true
+   },
+
+   deleteJob: async (_, { job_id }, { user }) => {
+      // if (!user) {
+      //    return false
+      // }
+
+      const partitions = await prisma.job_partition.findMany({
+         where: {
+            job_id
+         },
+         select: {
+            partition_id: true
+         }
+      })
+      const partitionIds = partitions.map((partition) => partition.partition_id)
+
+      const images = await prisma.job_image.findMany({
+         where: {
+            partition_id: {
+               in: partitionIds
+            }
+         },
+         select: {
+            image_id: true
+         }
+      })
+
+      const imageIds = images.map((image) => image.image_id)
+
+      await prisma.job.update({
+         where: {
+            job_id: job_id
+         },
+         data: {
+            status: 'deleted'
+         }
+      })
+
+      await prisma.image_label.deleteMany({
+         where: {
+            image_id: {
+               in: imageIds
+            }
+         }
+      })
+
+      await prisma.job_image.deleteMany({
+         where: {
+            partition_id: {
+               in: partitionIds
+            }
+         }
+      })
+
+      await prisma.job_partition.deleteMany({
+         where: {
+            job_id
+         }
+      })
+
+      await prisma.job_label.deleteMany({
+         where: {
+            job_id
+         }
+      })
+
+      return true
    }
 }
 
