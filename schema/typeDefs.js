@@ -51,6 +51,7 @@ const typeDefs = gql`
       labelJobState(partition_id: ID!): LabelJobState
       ownedJobs: [Job]
       acceptedJobs: [Job]
+      deletedJobs: [Job]
    }
 
    type Mutation {

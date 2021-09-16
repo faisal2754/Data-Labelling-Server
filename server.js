@@ -18,10 +18,10 @@ const startApolloServer = async () => {
    const app = express()
    app.use(function (req, res, next) {
       // Website you wish to allow to connect
-      res.setHeader(
-         'Access-Control-Allow-Origin',
-         'https://faisal2754.github.io'
-      )
+      res.setHeader('Access-Control-Allow-Origin', [
+         'https://faisal2754.github.io',
+         'http://localhost:3000'
+      ])
 
       // Request methods you wish to allow
       // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
