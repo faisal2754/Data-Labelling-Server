@@ -316,18 +316,19 @@ const mutations = {
    },
 
    deleteJob: async (_, { job_id }, { user }) => {
-      // if (!user) {
-      //    return false
-      // }
+      if (!user) {
+         return false
+      }
 
       const partitions = await prisma.job_partition.findMany({
          where: {
-            job_id
+            job_id: Number(job_id)
          },
          select: {
             partition_id: true
          }
       })
+
       const partitionIds = partitions.map((partition) => partition.partition_id)
 
       const images = await prisma.job_image.findMany({
@@ -345,7 +346,7 @@ const mutations = {
 
       await prisma.job.update({
          where: {
-            job_id: job_id
+            job_id: Number(job_id)
          },
          data: {
             status: 'deleted'
@@ -370,13 +371,13 @@ const mutations = {
 
       await prisma.job_partition.deleteMany({
          where: {
-            job_id
+            job_id: Number(job_id)
          }
       })
 
       await prisma.job_label.deleteMany({
          where: {
-            job_id
+            job_id: Number(job_id)
          }
       })
 

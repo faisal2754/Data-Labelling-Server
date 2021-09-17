@@ -224,6 +224,21 @@ const queries = {
 
       const deletedJobIds = deletedJobs.map((job) => job.job_id)
 
+      const { balance } = await prisma.user.findFirst({
+         where: {
+            user_id: userId
+         }
+      })
+
+      await prisma.user.update({
+         where: {
+            user_id: userId
+         },
+         data: {
+            balance: balance + 5 * deletedJobIds.length
+         }
+      })
+
       await prisma.job_labeller.deleteMany({
          where: {
             job_id: {

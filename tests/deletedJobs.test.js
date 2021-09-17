@@ -3,7 +3,7 @@ const express = require('express')
 const { graphqlUploadExpress } = require('graphql-upload')
 const { createTestClient } = require('apollo-server-integration-testing')
 const config = require('../apollo/config')
-const { LABEL_JOB_INFO, LABEL_JOB_STATE } = require('../graphql/queries')
+const { DELETED_JOBS } = require('../graphql/queries')
 const { REGISTER, ACCEPT_JOB, SAVE_STATE } = require('../graphql/mutations')
 const prisma = require('../prisma/client')
 const FormData = require('form-data')
@@ -23,7 +23,7 @@ beforeAll(async () => {
    app.use(graphqlUploadExpress())
    apolloServer.applyMiddleware({ app })
 
-   await new Promise((resolve) => app.listen({ port: 4004 }, resolve))
+   await new Promise((resolve) => app.listen({ port: 4007 }, resolve))
 
    const testClient = createTestClient({
       apolloServer
@@ -46,8 +46,8 @@ afterAll(async () => {
    await apolloServer.stop()
 })
 
-describe('Should save a jobs state', () => {
-   let jwt, jobId, partitionId, imageIds, labels
+describe('Should return deleted jobs of user', () => {
+   let jwt, jobId
 
    it('registers a new user', async () => {
       const result = await mutate(REGISTER, {
@@ -90,22 +90,10 @@ describe('Should save a jobs state', () => {
       form.append(
          'map',
          JSON.stringify({
-            0: ['variables.files.0'],
-            1: ['variables.files.1'],
-            2: ['variables.files.2'],
-            3: ['variables.files.3']
+            0: ['variables.files.0']
          })
       )
       form.append('0', fs.createReadStream('tests/temp.txt'), {
-         filename: 'temp.txt'
-      })
-      form.append('1', fs.createReadStream('tests/temp.txt'), {
-         filename: 'temp.txt'
-      })
-      form.append('2', fs.createReadStream('tests/temp.txt'), {
-         filename: 'temp.txt'
-      })
-      form.append('3', fs.createReadStream('tests/temp.txt'), {
          filename: 'temp.txt'
       })
 
@@ -117,7 +105,7 @@ describe('Should save a jobs state', () => {
          form.getHeaders()
       )
 
-      const res = await axios.post('http://localhost:4004/graphql', form, {
+      const res = await axios.post('http://localhost:4007/graphql', form, {
          headers
       })
 
@@ -148,7 +136,7 @@ describe('Should save a jobs state', () => {
       })
    })
 
-   it("should return a job's information", async () => {
+   it("should return the user's deleted jobs", async () => {
       setOptions({
          request: {
             headers: {
@@ -157,57 +145,26 @@ describe('Should save a jobs state', () => {
          }
       })
 
-      const result = await query(LABEL_JOB_INFO, {
-         variables: {
-            job_id: jobId
+      // fake
+      await prisma.job.update({
+         where: {
+            job_id: Number(jobId)
+         },
+         data: {
+            status: 'deleted'
          }
       })
 
-      partitionId = result.data.labelJobInfo.partition_id
-      imageIds = result.data.labelJobInfo.image_ids
-      labels = result.data.labelJobInfo.labels
+      const result = await query(DELETED_JOBS)
 
-      ok(partitionId)
-   })
-
-   it('should save a jobs state', async () => {
-      const imageLabels = [labels[0], labels[1]]
-
-      setOptions({
-         request: {
-            headers: {
-               authorization: `Bearer ${jwt}`
-            }
+      expect(result).toEqual({
+         data: {
+            deletedJobs: [
+               {
+                  job_id: jobId
+               }
+            ]
          }
       })
-
-      const result = await mutate(SAVE_STATE, {
-         variables: {
-            image_ids: imageIds,
-            labels: imageLabels,
-            partition_id: partitionId,
-            is_complete: true
-         }
-      })
-
-      ok(result)
-   })
-
-   it('should restore a jobs state', async () => {
-      setOptions({
-         request: {
-            headers: {
-               authorization: `Bearer ${jwt}`
-            }
-         }
-      })
-
-      const result = await query(LABEL_JOB_STATE, {
-         variables: {
-            partition_id: partitionId
-         }
-      })
-
-      expect(result.data.labelJobState.image_ids).toEqual(imageIds)
    })
 })
