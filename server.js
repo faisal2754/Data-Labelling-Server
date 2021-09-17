@@ -40,11 +40,7 @@ const startApolloServer = async () => {
    app.use(graphqlUploadExpress())
    app.use(
       cors({
-         origin: [
-            'http://localhost:3000',
-            'https://faisal2754.github.io',
-            'http://127.0.0.1:5500'
-         ],
+         origin: 'http://localhost:3000',
          credentials: true
       })
    )
