@@ -68,11 +68,18 @@ const SAVE_STATE = gql`
    }
 `
 
+const DELETE_JOB = gql`
+   mutation DeleteJob($job_id: ID!) {
+      deleteJob(job_id: $job_id)
+   }
+`
+
 module.exports = {
    REGISTER,
    LOGIN,
    CREATE_JOB,
    EDIT_PROFILE,
    ACCEPT_JOB,
-   SAVE_STATE
+   SAVE_STATE,
+   DELETE_JOB
 }
