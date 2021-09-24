@@ -162,11 +162,38 @@ const queries = {
 
       const jobs = await prisma.job.findMany({
          where: {
-            job_owner_id: userId
+            AND: [
+               {
+                  job_owner_id: userId
+               },
+               {
+                  status: 'active'
+               }
+            ]
          }
       })
 
-      return jobs
+      const jobsWithImages = jobs.map(async (job) => {
+         const partition = await prisma.job_partition.findFirst({
+            where: {
+               job_id: job.job_id
+            }
+         })
+
+         const previewImages = await prisma.job_image.findMany({
+            where: {
+               partition_id: partition.partition_id
+            },
+            take: 5
+         })
+
+         job.preview_images = previewImages.map(
+            (jobImage) => jobImage.image_uri
+         )
+         return job
+      })
+
+      return jobsWithImages
    },
 
    acceptedJobs: async (_, __, { user }) => {
@@ -192,7 +219,27 @@ const queries = {
          }
       })
 
-      return acceptedJobs
+      const jobsWithImages = acceptedJobs.map(async (job) => {
+         const partition = await prisma.job_partition.findFirst({
+            where: {
+               job_id: job.job_id
+            }
+         })
+
+         const previewImages = await prisma.job_image.findMany({
+            where: {
+               partition_id: partition.partition_id
+            },
+            take: 5
+         })
+
+         job.preview_images = previewImages.map(
+            (jobImage) => jobImage.image_uri
+         )
+         return job
+      })
+
+      return jobsWithImages
    },
 
    deletedJobs: async (_, __, { user }) => {
