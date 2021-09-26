@@ -56,17 +56,21 @@ const mutations = {
    editProfile: async (_, { username, password, avatar }, { user }) => {
       const user_id = user.user_id
 
+      let hashedPass
+
       if (!username) {
          username = user.username
       }
       if (!password) {
-         password = user.password
+         hashedPassword = user.password
       }
       if (!avatar) {
          avatar = user.avatar
       }
 
-      const hashedPass = await argon2.hash(password)
+      if (password) {
+         hashedPass = await argon2.hash(password)
+      }
 
       const updatedUser = await prisma.user.update({
          where: { user_id },
