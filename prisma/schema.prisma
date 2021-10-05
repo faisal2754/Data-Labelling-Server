@@ -13,7 +13,7 @@ model user {
   email        String         @unique
   password     String
   avatar       String?
-  balance      Int            @default(0)
+  balance      Int            @default(5000)
   job          job[]
   job_labeller job_labeller[]
   image_label  image_label[]
