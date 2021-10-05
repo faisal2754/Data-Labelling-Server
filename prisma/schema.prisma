@@ -41,6 +41,7 @@ model job_labeller {
   user          user          @relation(fields: [user_id], references: [user_id])
   partition_id  Int
   job_partition job_partition @relation(fields: [partition_id], references: [partition_id])
+  is_complete   Boolean       @default(false)
 
   @@id([job_id, user_id, partition_id])
 }

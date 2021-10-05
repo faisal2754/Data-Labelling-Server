@@ -91,17 +91,24 @@ const mutations = {
       { title, description, credits, labels, num_partitions, files },
       { user }
    ) => {
+      const totalCost = Number(credits) * Number(num_partitions)
+      if (user.balance < totalCost) {
+         throw new Error('Insufficient funds.')
+      }
+
       // Job metadata
       const job_owner_id = user.user_id
       const numLabels = labels.length
       const maxNumLabellers =
          numLabels % 2 === 0 ? numLabels + 1 : numLabels + 2
 
+      const creditsPerLabeller = Math.floor(Number(credits) / maxNumLabellers)
+
       const job = await prisma.job.create({
          data: {
             title,
             description,
-            credits,
+            credits: creditsPerLabeller,
             job_owner_id,
             labellers_per_partition: maxNumLabellers
          }
@@ -195,6 +202,15 @@ const mutations = {
 
          startIdx = partitionInfo.splitArr[i]
       }
+
+      await prisma.user.update({
+         where: {
+            user_id: user.user_id
+         },
+         data: {
+            balance: user.balance - totalCost
+         }
+      })
 
       return job
    },
@@ -307,6 +323,15 @@ const mutations = {
                where: { job_id }
             })
          ).labellers_per_partition
+
+         await prisma.job_labeller.update({
+            where: {
+               AND: [{ job_id }, { partition_id }, { user_id: userId }]
+            },
+            data: {
+               is_complete: true
+            }
+         })
 
          if (complete_counter + 1 === magic_number) {
             await prisma.job_partition.update({
