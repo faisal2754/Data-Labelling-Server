@@ -52,6 +52,7 @@ const typeDefs = gql`
       ownedJobs: [Job]
       acceptedJobs: [Job]
       deletedJobs: [Job]
+      completedJobs: [Job]
    }
 
    type Mutation {

@@ -333,6 +333,21 @@ const mutations = {
             }
          })
 
+         const credits = (
+            await prisma.job.findFirst({
+               where: { job_id }
+            })
+         ).credits
+
+         await prisma.user.update({
+            where: {
+               user_id: userId
+            },
+            data: {
+               balance: user.balance + credits
+            }
+         })
+
          if (complete_counter + 1 === magic_number) {
             await prisma.job_partition.update({
                where: { partition_id: Number(partition_id) },

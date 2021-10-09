@@ -31,7 +31,6 @@ const queries = {
               }
            })
 
-      // DISGUSTING
       const getAvailableJobs = async () => {
          let availableJobs = []
 
@@ -49,7 +48,6 @@ const queries = {
 
          return availableJobs
       }
-      //END
 
       const availableJobs = await getAvailableJobs()
 
@@ -295,6 +293,48 @@ const queries = {
       })
 
       return deletedJobs
+   },
+
+   completedJobs: async (_, __, { user }) => {
+      const userId = user.user_id
+
+      const jobs = await prisma.job.findMany({
+         where: {
+            job_owner_id: userId
+         }
+      })
+
+      const job_ids = jobs.map((job) => job.job_id)
+      let completedJobs = []
+
+      for (let job_id of job_ids) {
+         const partitions = await prisma.job_partition.findMany({
+            where: {
+               job_id
+            }
+         })
+
+         let isComplete = true
+
+         for (let partition of partitions) {
+            if (!partition.is_complete) {
+               isComplete = false
+               break
+            }
+         }
+
+         if (isComplete) {
+            completedJobs.push(job_id)
+         }
+      }
+
+      return await prisma.job.findMany({
+         where: {
+            job_id: {
+               in: completedJobs
+            }
+         }
+      })
    }
 }
 
