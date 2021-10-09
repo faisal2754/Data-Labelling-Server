@@ -199,7 +199,7 @@ const queries = {
 
       const acceptedJobRecords = await prisma.job_labeller.findMany({
          where: {
-            AND: [{ user_id: userId }, { is_completed: false }]
+            AND: [{ user_id: userId }, { is_complete: false }]
          },
          distinct: ['job_id'],
          select: {
