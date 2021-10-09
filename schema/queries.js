@@ -10,26 +10,63 @@ const queries = {
    viewJobs: async (_, __, { user }) => {
       const job_owner_id = user?.user_id
 
-      const jobs = job_owner_id
-         ? await prisma.job.findMany({
-              where: {
-                 AND: [
-                    {
-                       NOT: {
-                          job_owner_id: job_owner_id
-                       }
-                    },
-                    {
-                       status: 'active'
-                    }
-                 ]
-              }
-           })
-         : await prisma.job.findMany({
-              where: {
-                 status: 'active'
-              }
-           })
+      let jobs
+
+      if (job_owner_id) {
+         jobs = await prisma.job.findMany({
+            where: {
+               AND: [
+                  {
+                     NOT: {
+                        job_owner_id: job_owner_id
+                     }
+                  },
+                  {
+                     status: 'active'
+                  }
+               ]
+            }
+         })
+
+         const acceptedJobs = await prisma.job_labeller.findMany({
+            where: {
+               user_id: job_owner_id
+            }
+         })
+
+         const acceptedJobIds = new Set()
+
+         for (let job of acceptedJobs) {
+            acceptedJobIds.add(job.job_id)
+         }
+
+         let removedIds = []
+
+         for (let id of acceptedJobIds) {
+            let rows = acceptedJobs.filter((job) => job.job_id === id)
+
+            let isCompleted = true
+
+            for (let row of rows) {
+               if (!row.is_complete) {
+                  isCompleted = false
+                  break
+               }
+            }
+
+            if (!isCompleted) {
+               removedIds.push(id)
+            }
+         }
+
+         jobs = jobs.filter((job) => !removedIds.includes(job.job_id))
+      } else {
+         jobs = await prisma.job.findMany({
+            where: {
+               status: 'active'
+            }
+         })
+      }
 
       const getAvailableJobs = async () => {
          let availableJobs = []
