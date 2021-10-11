@@ -326,7 +326,11 @@ const mutations = {
 
          await prisma.job_labeller.update({
             where: {
-               AND: [{ job_id }, { partition_id }, { user_id: userId }]
+               AND: [
+                  { job_id },
+                  { partition_id: Number(partition_id) },
+                  { user_id: userId }
+               ]
             },
             data: {
                is_complete: true
