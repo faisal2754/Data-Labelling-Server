@@ -104,6 +104,10 @@ const mutations = {
 
       const creditsPerLabeller = Math.floor(Number(credits) / maxNumLabellers)
 
+      if (!creditsPerLabeller) {
+         throw new Error('Please increase your credits.')
+      }
+
       const job = await prisma.job.create({
          data: {
             title,
