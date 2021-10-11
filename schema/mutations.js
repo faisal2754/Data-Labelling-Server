@@ -320,17 +320,22 @@ const mutations = {
 
          const magic_number = (
             await prisma.job.findFirst({
-               where: { job_id }
+               where: { job_id: Number(job_id) }
             })
          ).labellers_per_partition
 
          await prisma.job_labeller.update({
             where: {
-               AND: [
-                  { job_id: Number(job_id) },
-                  { partition_id: Number(partition_id) },
-                  { user_id: userId }
-               ]
+               job_id_user_id_partition_id: {
+                  job_id: Number(job_id),
+                  user_id: userId,
+                  partition_id: Number(partition_id)
+               }
+               // AND: [
+               //    { job_id: Number(job_id) },
+               //    { partition_id: Number(partition_id) },
+               //    { user_id: userId }
+               // ]
             },
             data: {
                is_complete: true
@@ -339,7 +344,7 @@ const mutations = {
 
          const credits = (
             await prisma.job.findFirst({
-               where: { job_id }
+               where: { job_id: Number(job_id) }
             })
          ).credits
 
@@ -352,14 +357,19 @@ const mutations = {
             }
          })
 
-         await prisma.job_labeller.update({
-            where: {
-               AND: [{ user_id: userId }, { job_id: Number(job_id) }]
-            },
-            data: {
-               is_complete: true
-            }
-         })
+         // await prisma.job_labeller.update({
+         //    where: {
+         //       job_id_user_id_partition_id: {
+         //          job_id: Number(job_id),
+         //          user_id: userId,
+         //          partition_id: Number(partition_id)
+         //       }
+         //       // AND: [{ user_id: userId }, { job_id: Number(job_id) }]
+         //    },
+         //    data: {
+         //       is_complete: true
+         //    }
+         // })
 
          if (complete_counter + 1 === magic_number) {
             await prisma.job_partition.update({

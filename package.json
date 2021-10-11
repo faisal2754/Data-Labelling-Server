@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "npx prisma generate && node server.js",
-    "dev": "node server.js",
+    "dev": "nodemon server.js",
     "migrate:actions": "npx prisma migrate dev --name test",
     "migrate:test": "npx prisma migrate dev --name test --schema=./prisma/schema.test.prisma",
     "docker:up": "docker-compose -f tests/docker-compose.yml up -d",
