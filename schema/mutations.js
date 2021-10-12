@@ -104,7 +104,7 @@ const mutations = {
 
       const creditsPerLabeller = Math.floor(Number(credits) / maxNumLabellers)
 
-      if (!creditsPerLabeller) {
+      if (Number(credits) < maxNumLabellers) {
          throw new Error('Please increase your credits.')
       }
 
