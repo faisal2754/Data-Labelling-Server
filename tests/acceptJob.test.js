@@ -78,7 +78,7 @@ describe('Allow a user to accept a job', () => {
                files: [],
                title: 'testing job',
                description: 'abc',
-               credits: 2,
+               credits: 5,
                num_partitions: 2,
                labels: ['apple', 'banana', 'cherry']
             }
