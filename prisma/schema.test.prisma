@@ -13,7 +13,7 @@ model user {
     email        String         @unique
     password     String
     avatar       String?
-    balance      Int            @default(0)
+    balance      Int            @default(5000)
     job          job[]
     job_labeller job_labeller[]
     image_label  image_label[]
@@ -41,6 +41,7 @@ model job_labeller {
     user          user          @relation(fields: [user_id], references: [user_id])
     partition_id  Int
     job_partition job_partition @relation(fields: [partition_id], references: [partition_id])
+    is_complete   Boolean       @default(false)
 
     @@id([job_id, user_id, partition_id])
 }

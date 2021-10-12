@@ -81,7 +81,7 @@ describe('Should return deleted jobs of user', () => {
                files: [],
                title: 'testing job',
                description: 'abc',
-               credits: 2,
+               credits: 5,
                num_partitions: 2,
                labels: ['apple', 'banana', 'cherry']
             }

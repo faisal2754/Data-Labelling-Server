@@ -81,7 +81,7 @@ describe('Should save a jobs state', () => {
                files: [],
                title: 'testing job',
                description: 'abc',
-               credits: 5,
+               credits: 500,
                num_partitions: 2,
                labels: ['apple', 'banana', 'cherry']
             }

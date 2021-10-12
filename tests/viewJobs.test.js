@@ -79,7 +79,7 @@ describe('ViewJobs returns all the existing jobs', () => {
                files: [],
                title: 'testing job',
                description: 'abc',
-               credits: 2,
+               credits: 5,
                num_partitions: 2,
                labels: ['apple', 'banana', 'cherry']
             }
