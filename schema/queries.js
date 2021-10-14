@@ -43,18 +43,27 @@ const queries = {
          let removedIds = []
 
          for (let id of acceptedJobIds) {
+            const numPartitions = await prisma.job_partition.count({
+               where: {
+                  job_id: id
+               }
+            })
+
             let rows = acceptedJobs.filter((job) => job.job_id === id)
 
             let isCompleted = true
 
+            let count = 0
             for (let row of rows) {
                if (!row.is_complete) {
                   isCompleted = false
                   break
+               } else {
+                  count += 1
                }
             }
 
-            if (!isCompleted) {
+            if (!isCompleted || numPartitions == count) {
                removedIds.push(id)
             }
          }
