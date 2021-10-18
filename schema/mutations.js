@@ -1,5 +1,7 @@
 const argon2 = require('argon2')
 const jwt = require('jsonwebtoken')
+const fs = require('fs')
+const { Parser } = require('json2csv')
 const GoogleDrive = require('../google/GoogleDrive')
 const prisma = require('../prisma/client')
 
@@ -450,6 +452,94 @@ const mutations = {
          where: {
             job_id: Number(job_id)
          }
+      })
+
+      return true
+   },
+
+   jobResults: async (_, __, { user }) => {
+      const userId = 101
+      const jobId = 169
+
+      const resultJob = await prisma.job.findFirst({
+         where: {
+            job_id: jobId
+         },
+         select: {
+            job_owner_id: true
+         }
+      })
+
+      if (userId !== resultJob.job_owner_id) return false
+
+      const jobsInfo = await prisma.job.findFirst({
+         where: {
+            job_id: jobId
+         },
+         include: {
+            job_partition: {
+               include: {
+                  job_image: {
+                     include: {
+                        image_label: true
+                     }
+                  }
+               }
+            }
+         }
+      })
+
+      let imageInfo = []
+      for (let partition of jobsInfo.job_partition) {
+         // console.log(partition)
+         for (let image of partition.job_image) {
+            imageInfo.push(image)
+         }
+      }
+
+      let result = []
+
+      for (let info of imageInfo) {
+         const image_url = info.image_uri
+         const allImageLabels = info.image_label.map(
+            (labelInfo) => labelInfo.label
+         )
+
+         let uniqueLabels = [...new Set(allImageLabels)]
+         let labelCounts = {}
+         for (let label of uniqueLabels) {
+            labelCounts[label] = 0
+         }
+         for (let imgLabel of allImageLabels) {
+            labelCounts[imgLabel] += 1
+         }
+         let values = Object.values(labelCounts)
+         let mode = values.indexOf(Math.max(...values))
+
+         let confidence =
+            Math.round((Math.max(...values) / allImageLabels.length) * 10000) /
+            100
+
+         let row = {
+            image_url: info.image_uri,
+            mode_label: uniqueLabels[mode],
+            confidence: `${confidence}%`
+         }
+
+         for (let i = 0; i < allImageLabels.length; i++) {
+            const label = allImageLabels[i]
+            row[`labeller${i}`] = label
+         }
+
+         result.push(row)
+      }
+
+      const fields = Object.keys(result[0])
+
+      const csv = new Parser({ fields })
+      fs.writeFile('data.csv', csv.parse(result), (err) => {
+         if (err) console.log(err)
+         else console.log('File saved')
       })
 
       return true
