@@ -491,7 +491,6 @@ const mutations = {
 
       let imageInfo = []
       for (let partition of jobsInfo.job_partition) {
-         // console.log(partition)
          for (let image of partition.job_image) {
             imageInfo.push(image)
          }
@@ -500,7 +499,6 @@ const mutations = {
       let result = []
 
       for (let info of imageInfo) {
-         const image_url = info.image_uri
          const allImageLabels = info.image_label.map(
             (labelInfo) => labelInfo.label
          )
