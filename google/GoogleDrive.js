@@ -104,6 +104,7 @@ class GoogleDrive {
                fields: 'id, name'
             })
          )
+         setTimeout(() => {}, 500)
       }
       const response = await Promise.all(promises)
 
