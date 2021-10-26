@@ -97,18 +97,16 @@ class GoogleDrive {
             mimeType: 'image/jpeg',
             body: streams[i]
          }
-         promises.push(
-            this.drive.files.create({
-               resource: fileMetadata,
-               media: media,
-               fields: 'id, name'
-            })
-         )
-         setTimeout(() => {}, 500)
+         const resolved = await this.drive.files.create({
+            resource: fileMetadata,
+            media: media,
+            fields: 'id, name'
+         })
+         promises.push(resolved)
       }
-      const response = await Promise.all(promises)
+      // const response = await Promise.all(promises)
 
-      return response.map((res) => res.data.id)
+      return promises.map((res) => res.data.id)
    }
 
    // uploadFiles(files, path) {
