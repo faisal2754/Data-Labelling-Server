@@ -102,11 +102,12 @@ class GoogleDrive {
             media: media,
             fields: 'id, name'
          })
-         promises.push(resolved)
+         promises.push(resolved.data.id)
       }
       // const response = await Promise.all(promises)
 
-      return promises.map((res) => res.data.id)
+      // return promises.map((res) => res.data.id)
+      return promises
    }
 
    // uploadFiles(files, path) {
