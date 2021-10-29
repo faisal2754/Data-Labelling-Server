@@ -378,13 +378,35 @@ const queries = {
          }
       }
 
-      return await prisma.job.findMany({
+      const jobsWithoutImgs = await prisma.job.findMany({
          where: {
             job_id: {
                in: completedJobs
             }
          }
       })
+
+      const jobsWithImgs = jobsWithoutImgs.map(async (job) => {
+         const partition = await prisma.job_partition.findFirst({
+            where: {
+               job_id: job.job_id
+            }
+         })
+
+         const previewImages = await prisma.job_image.findMany({
+            where: {
+               partition_id: partition.partition_id
+            },
+            take: 5
+         })
+
+         job.preview_images = previewImages.map(
+            (jobImage) => jobImage.image_uri
+         )
+         return job
+      })
+
+      return jobsWithImgs
    }
 }
 

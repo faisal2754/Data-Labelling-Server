@@ -457,20 +457,26 @@ const mutations = {
       return true
    },
 
-   jobResults: async (_, __, { user }) => {
-      const userId = 101
-      const jobId = 169
+   jobResults: async (_, job_id, { user }) => {
+      const userId = user.user_id
+      const jobId = job_id
 
       const resultJob = await prisma.job.findFirst({
          where: {
             job_id: jobId
          },
          select: {
-            job_owner_id: true
+            job_owner_id: true,
+            results: true
          }
       })
 
-      if (userId !== resultJob.job_owner_id) return false
+      if (userId !== resultJob.job_owner_id)
+         throw new Error("You don't own this job.")
+
+      if (resultJob.results) {
+         return resultJob.results
+      }
 
       const jobsInfo = await prisma.job.findFirst({
          where: {
@@ -535,12 +541,24 @@ const mutations = {
       const fields = Object.keys(result[0])
 
       const csv = new Parser({ fields })
+
       fs.writeFile('data.csv', csv.parse(result), (err) => {
          if (err) console.log(err)
          else console.log('File saved')
       })
 
-      return true
+      const link = await gDrive.uploadCSV()
+
+      await prisma.job.update({
+         where: {
+            job_id: jobId
+         },
+         data: {
+            results: link
+         }
+      })
+
+      return link
    }
 }
 

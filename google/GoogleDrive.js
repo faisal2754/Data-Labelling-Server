@@ -1,4 +1,5 @@
 const { google } = require('googleapis')
+const fs = require('fs')
 
 class GoogleDrive {
    constructor() {
@@ -50,23 +51,26 @@ class GoogleDrive {
    //    return Promise.all(promises)
    // }
 
-   // uploadFile(file, path) {
-   //    const fileMetadata = {
-   //       name: file,
-   //       parents: ['165e-zApP58GI_zJHr2wDzSbxIFet29kk']
-   //    }
-   //    const media = {
-   //       mimeType: 'image/jpeg',
-   //       body: fs.createReadStream(path + file)
-   //    }
-   //    const promise = this.drive.files.create({
-   //       resource: fileMetadata,
-   //       media: media,
-   //       fields: 'id, name'
-   //    })
+   async uploadCSV() {
+      const fileMetadata = {
+         name: 'data.csv',
+         parents: ['165e-zApP58GI_zJHr2wDzSbxIFet29kk']
+      }
+      const media = {
+         mimeType: 'text/csv',
+         body: fs.createReadStream('./data.csv')
+      }
+      const res = await this.drive.files.create({
+         resource: fileMetadata,
+         media: media,
+         fields: 'id, name'
+      })
 
-   //    return promise
-   // }
+      const { id } = res.data
+      const link = `https://drive.google.com/open?id=${id}`
+
+      return link
+   }
 
    // uploadStream(name, stream) {
    //    const fileMetadata = {

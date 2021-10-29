@@ -3,3 +3,4 @@ node_modules
 uploadedFiles/
 coverage/
 .vscode
+data.csv

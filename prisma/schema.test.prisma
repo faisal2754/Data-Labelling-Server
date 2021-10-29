@@ -27,6 +27,7 @@ model job {
     credits                 Int
     labellers_per_partition Int
     status                  String          @default("active")
+    results                 String?
     job_owner_id            Int
     job_owner               user            @relation(fields: [job_owner_id], references: [user_id])
     job_labeller            job_labeller[]
