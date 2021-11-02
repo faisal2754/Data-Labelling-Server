@@ -106,8 +106,8 @@ const mutations = {
 
       const creditsPerLabeller = Math.floor(Number(credits) / maxNumLabellers)
 
-      if (Number(credits) < maxNumLabellers) {
-         throw new Error('Please increase your credits.')
+      if (creditsPerLabeller <= 0) {
+         throw new Error('Not enough credits per labeller!')
       }
 
       const job = await prisma.job.create({
@@ -459,7 +459,7 @@ const mutations = {
 
    jobResults: async (_, { job_id }, { user }) => {
       const userId = user.user_id
-      const jobId = job_id
+      const jobId = Number(job_id)
 
       const resultJob = await prisma.job.findFirst({
          where: {

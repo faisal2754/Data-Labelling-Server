@@ -75,7 +75,7 @@ const typeDefs = gql`
          is_complete: Boolean
       ): Boolean
       deleteJob(job_id: ID!): Boolean
-      jobResults: String
+      jobResults(job_id: ID!): String
    }
 `
 
