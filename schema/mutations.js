@@ -457,7 +457,7 @@ const mutations = {
       return true
    },
 
-   jobResults: async (_, job_id, { user }) => {
+   jobResults: async (_, { job_id }, { user }) => {
       const userId = user.user_id
       const jobId = job_id
 
