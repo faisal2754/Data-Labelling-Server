@@ -18,8 +18,10 @@ const { ok } = require('assert')
 
 jest.setTimeout(30000)
 
+let apolloServer
+
 beforeAll(async () => {
-   const apolloServer = new ApolloServer(config)
+   apolloServer = new ApolloServer(config)
    await apolloServer.start()
 
    const app = express()
