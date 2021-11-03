@@ -442,6 +442,12 @@ const mutations = {
          }
       })
 
+      await prisma.job_labeller.deleteMany({
+         where: {
+            job_id: Number(job_id)
+         }
+      })
+
       await prisma.job_partition.deleteMany({
          where: {
             job_id: Number(job_id)
