@@ -64,6 +64,14 @@ const DELETED_JOBS = gql`
    }
 `
 
+const COMPLETED_JOBS = gql`
+   query CompletedJobs {
+      completedJobs {
+         job_id
+      }
+   }
+`
+
 module.exports = {
    BRUH,
    ME,
@@ -72,5 +80,6 @@ module.exports = {
    LABEL_JOB_STATE,
    OWNED_JOBS,
    ACCEPTED_JOBS,
-   DELETED_JOBS
+   DELETED_JOBS,
+   COMPLETED_JOBS
 }
