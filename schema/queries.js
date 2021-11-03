@@ -293,31 +293,27 @@ const queries = {
    deletedJobs: async (_, __, { user }) => {
       const userId = user.user_id
 
-      const userJobs = await prisma.job_labeller.findMany({
+      const deletedJobRecords = await prisma.deleted_jobs.findMany({
          where: {
             user_id: userId
-         },
-         select: {
-            job_id: true
          }
       })
 
-      const userJobIds = userJobs.map((job) => job.job_id)
+      const deletedJobIds = deletedJobRecords.map((job) => job.job_id)
 
       const deletedJobs = await prisma.job.findMany({
          where: {
-            AND: [
-               {
-                  job_id: {
-                     in: userJobIds
-                  }
-               },
-               { status: 'deleted' }
-            ]
+            job_id: {
+               in: deletedJobIds
+            }
          }
       })
 
-      const deletedJobIds = deletedJobs.map((job) => job.job_id)
+      await prisma.deleted_jobs.deleteMany({
+         where: {
+            user_id: userId
+         }
+      })
 
       const { balance } = await prisma.user.findFirst({
          where: {
@@ -331,14 +327,6 @@ const queries = {
          },
          data: {
             balance: balance + 5 * deletedJobIds.length
-         }
-      })
-
-      await prisma.job_labeller.deleteMany({
-         where: {
-            job_id: {
-               in: deletedJobIds
-            }
          }
       })
 

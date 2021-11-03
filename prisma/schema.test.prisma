@@ -17,6 +17,7 @@ model user {
     job          job[]
     job_labeller job_labeller[]
     image_label  image_label[]
+    deleted_jobs deleted_jobs[]
 }
 
 model job {
@@ -33,6 +34,7 @@ model job {
     job_labeller            job_labeller[]
     job_label               job_label[]
     job_partition           job_partition[]
+    deleted_jobs            deleted_jobs[]
 }
 
 model job_labeller {
@@ -82,4 +84,13 @@ model job_partition {
     job              job            @relation(fields: [job_id], references: [job_id])
     job_labeller     job_labeller[]
     job_image        job_image[]
+}
+
+model deleted_jobs {
+    user_id Int
+    job_id  Int
+    user    user @relation(fields: [user_id], references: [user_id])
+    job     job  @relation(fields: [job_id], references: [job_id])
+
+    @@id([user_id, job_id])
 }

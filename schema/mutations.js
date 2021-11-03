@@ -393,6 +393,27 @@ const mutations = {
          return false
       }
 
+      const users = await prisma.job_labeller.findMany({
+         where: {
+            job_id: Number(job_id)
+         },
+         select: {
+            user_id: true
+         }
+      })
+
+      const userIdArr = users.map((id) => id.user_id)
+      const userIds = [...new Set(userIdArr)]
+
+      userIds.forEach(async (id) => {
+         await prisma.deleted_jobs.create({
+            data: {
+               user_id: id,
+               job_id: Number(job_id)
+            }
+         })
+      })
+
       const partitions = await prisma.job_partition.findMany({
          where: {
             job_id: Number(job_id)
