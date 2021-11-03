@@ -4,7 +4,12 @@ const { graphqlUploadExpress } = require('graphql-upload')
 const { createTestClient } = require('apollo-server-integration-testing')
 const config = require('../apollo/config')
 const { DELETED_JOBS } = require('../graphql/queries')
-const { REGISTER, ACCEPT_JOB, SAVE_STATE } = require('../graphql/mutations')
+const {
+   REGISTER,
+   ACCEPT_JOB,
+   SAVE_STATE,
+   DELETE_JOB
+} = require('../graphql/mutations')
 const prisma = require('../prisma/client')
 const FormData = require('form-data')
 const fs = require('fs')
@@ -136,7 +141,7 @@ describe('Should return deleted jobs of user', () => {
       })
    })
 
-   it("should return the user's deleted jobs", async () => {
+   it('should deleted the job', async () => {
       setOptions({
          request: {
             headers: {
@@ -145,13 +150,21 @@ describe('Should return deleted jobs of user', () => {
          }
       })
 
-      // fake
-      await prisma.job.update({
-         where: {
-            job_id: Number(jobId)
-         },
-         data: {
-            status: 'deleted'
+      const deleted = await mutate(DELETE_JOB, {
+         variables: {
+            job_id: jobId
+         }
+      })
+
+      ok(deleted)
+   })
+
+   it("should return the user's deleted jobs", async () => {
+      setOptions({
+         request: {
+            headers: {
+               authorization: `Bearer ${jwt}`
+            }
          }
       })
 

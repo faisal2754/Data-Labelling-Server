@@ -16,6 +16,8 @@ const fs = require('fs')
 const axios = require('axios').default
 const { ok } = require('assert')
 
+jest.setTimeout(30000)
+
 beforeAll(async () => {
    apolloServer = new ApolloServer(config)
    await apolloServer.start()
