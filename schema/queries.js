@@ -338,7 +338,7 @@ const queries = {
 
       const jobs = await prisma.job.findMany({
          where: {
-            job_owner_id: userId
+            AND: [{ job_owner_id: userId }, { status: 'active' }]
          }
       })
 
@@ -373,6 +373,8 @@ const queries = {
             }
          }
       })
+
+      console.log(jobsWithoutImgs)
 
       const jobsWithImgs = jobsWithoutImgs.map(async (job) => {
          const partition = await prisma.job_partition.findFirst({
